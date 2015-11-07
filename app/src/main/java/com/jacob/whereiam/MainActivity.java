@@ -1,5 +1,6 @@
 package com.jacob.whereiam;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    String jsonTest = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,5 +91,28 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return result;
+    }
+    public class AsyncTaskParseJson extends AsyncTask<String, String, String> {
+
+        String yourServiceUrl = "Put the URL here!!!!!";
+
+        @Override
+        protected void onPreExecute() {}
+
+        @Override
+        protected String doInBackground(String... arg0)  {
+
+            try {
+                httpConnect jParser = new httpConnect();
+
+                String json = jParser.getJSONFromUrl(yourServiceUrl);
+
+                jsonTest = json.toString();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 }

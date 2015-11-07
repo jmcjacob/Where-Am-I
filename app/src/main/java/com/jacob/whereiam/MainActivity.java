@@ -1,5 +1,6 @@
 package com.jacob.whereiam;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -93,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
     public class AsyncTaskParseJson extends AsyncTask<String, String, String> {
+
+        Uri.Builder builder = new Uri.Builder();
+
 
         String yourServiceUrl = "Put the URL here!!!!!";
 

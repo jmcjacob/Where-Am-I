@@ -24,8 +24,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    String jsonTest = "";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,13 +34,16 @@ public class MainActivity extends AppCompatActivity {
         DrawerFragment drawer = (DrawerFragment) getSupportFragmentManager().findFragmentById(R.id.drawer_fragment);
         drawer.setup(R.id.drawer_fragment, (DrawerLayout) findViewById(R.id.drawer_layout), (Toolbar) toolbar);
 
-        RecyclerView recList = (RecyclerView) findViewById(R.id.cardview);
+        /*RecyclerView recList = (RecyclerView) findViewById(R.id.cardview);
         recList.setHasFixedSize(true);
         GridLayoutManager llm = new GridLayoutManager(this,2);
         llm.setOrientation(GridLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
         ImageAdapter image = new ImageAdapter(createList(1));
-        recList.setAdapter(image);
+        recList.setAdapter(image);*/
+
+        FetchImageTask task = new FetchImageTask();
+        task.execute("Atherstone");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -88,35 +89,7 @@ public class MainActivity extends AppCompatActivity {
             ci.SRC = Image.SRC_PREFIX + i;
 
             result.add(ci);
-
         }
-
         return result;
-    }
-    public class AsyncTaskParseJson extends AsyncTask<String, String, String> {
-
-        Uri.Builder builder = new Uri.Builder();
-
-
-        String yourServiceUrl = "Put the URL here!!!!!";
-
-        @Override
-        protected void onPreExecute() {}
-
-        @Override
-        protected String doInBackground(String... arg0)  {
-
-            try {
-                httpConnect jParser = new httpConnect();
-
-                String json = jParser.getJSONFromUrl(yourServiceUrl);
-
-                jsonTest = json.toString();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
     }
 }

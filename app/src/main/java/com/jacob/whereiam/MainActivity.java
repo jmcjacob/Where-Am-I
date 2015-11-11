@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         recList.setAdapter(image);*/
 
         FetchImageTask task = new FetchImageTask();
-        task.execute("Atherstone");
+        task.execute("image","22523213987");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

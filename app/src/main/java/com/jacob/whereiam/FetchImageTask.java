@@ -75,10 +75,22 @@ public class FetchImageTask extends AsyncTask<String, Integer, String[]> {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String imageJsonStr = null;
+        URL url = null;
 
         try
         {
-            URL url = new URL("https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=5e4604aaf0ff1d97a4a621f9b0d06e17&text=" + Parameters[0] + "&format=json");
+            if (Parameters[0] == "gallery")
+            {
+                url = new URL("https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=5e4604aaf0ff1d97a4a621f9b0d06e17&text=" + Parameters[1] + "&format=json");
+            }
+            else if (Parameters[0] == "image")
+            {
+                url = new URL("https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key=5e4604aaf0ff1d97a4a621f9b0d06e17&photo_id=" + Parameters[1] + "&format=json");
+            }
+            else
+            {
+                return null;
+            }
 
             Log.v(LOG_TAG, "Built URI " + url.toString());
 

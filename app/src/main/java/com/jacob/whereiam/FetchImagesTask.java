@@ -11,11 +11,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 
-public class FetchImageTask extends AsyncTask<String, Integer, String[]> {
+public class FetchImagesTask extends AsyncTask<String, Integer, String[]> {
 
-    private final String LOG_TAG = FetchImageTask.class.getSimpleName();
+    private final String LOG_TAG = FetchImagesTask.class.getSimpleName();
 
     /*private String[] getImageDataFromJson(String forecastJsonStr)
             throws JSONException {
@@ -75,22 +76,22 @@ public class FetchImageTask extends AsyncTask<String, Integer, String[]> {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String imageJsonStr = null;
-        URL url = null;
 
         try
         {
-            if (Parameters[0] == "gallery")
-            {
-                url = new URL("https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=5e4604aaf0ff1d97a4a621f9b0d06e17&text=" + Parameters[1] + "&format=json");
-            }
-            else if (Parameters[0] == "image")
-            {
-                url = new URL("https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key=5e4604aaf0ff1d97a4a621f9b0d06e17&photo_id=" + Parameters[1] + "&format=json");
-            }
-            else
-            {
-                return null;
-            }
+            final String Flickr_BASE_URL =
+                    "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=5e4604aaf0ff1d97a4a621f9b0d06e17";
+            final String TEXT_PARAM = "text";
+            final String FORMAT_PARAM = "format";
+
+            Uri builtUri = Uri.parse(Flickr_BASE_URL).buildUpon()
+                    .appendQueryParameter(TEXT_PARAM, Parameters[0])
+                    .appendQueryParameter(FORMAT_PARAM, "json")
+                    .build();
+
+            URL url = new URL(builtUri.toString());
+
+                //https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key=5e4604aaf0ff1d97a4a621f9b0d06e17&photo_id=" + Parameters[1] + "&format=json
 
             Log.v(LOG_TAG, "Built URI " + url.toString());
 
@@ -117,7 +118,7 @@ public class FetchImageTask extends AsyncTask<String, Integer, String[]> {
             }
             imageJsonStr = buffer.toString();
 
-            Log.v(LOG_TAG, "image string: " + imageJsonStr);
+            Log.v(LOG_TAG, "galley string: " + imageJsonStr);
         }
         catch (IOException e)
         {

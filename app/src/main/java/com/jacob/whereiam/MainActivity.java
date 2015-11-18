@@ -34,16 +34,13 @@ public class MainActivity extends AppCompatActivity {
         DrawerFragment drawer = (DrawerFragment) getSupportFragmentManager().findFragmentById(R.id.drawer_fragment);
         drawer.setup(R.id.drawer_fragment, (DrawerLayout) findViewById(R.id.drawer_layout), (Toolbar) toolbar);
 
-        /*RecyclerView recList = (RecyclerView) findViewById(R.id.cardview);
+        RecyclerView recList = (RecyclerView) findViewById(R.id.cardview);
         recList.setHasFixedSize(true);
         GridLayoutManager llm = new GridLayoutManager(this,2);
         llm.setOrientation(GridLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
-        ImageAdapter image = new ImageAdapter(createList(1));
-        recList.setAdapter(image);*/
-
-        FetchImagesTask task = new FetchImagesTask();
-        task.execute("image","22523213987");
+        ImageAdapter image = new ImageAdapter(createList());
+        recList.setAdapter(image);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -78,18 +75,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private List<Image> createList(int size)
+    private List createList()
     {
-
-        List<Image> result = new ArrayList<Image>();
-        for (int i=1; i <= size; i++)
-        {
-            Image ci = new Image();
-            ci.Title = Image.TITLE_PREFIX + i;
-            ci.SRC = Image.SRC_PREFIX + i;
-
-            result.add(ci);
-        }
-        return result;
+        FetchImagesTask task = new FetchImagesTask();
+        task.execute("Atherstone");
+        return task.images;
     }
 }

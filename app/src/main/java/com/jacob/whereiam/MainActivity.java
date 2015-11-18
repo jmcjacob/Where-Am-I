@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         ImageAdapter image = new ImageAdapter(createList(1));
         recList.setAdapter(image);*/
 
-        FetchImageTask task = new FetchImageTask();
+        FetchImagesTask task = new FetchImagesTask();
         task.execute("image","22523213987");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

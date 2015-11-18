@@ -2,76 +2,75 @@ package com.jacob.whereiam;
 
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.JsonReader;
 import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FetchImagesTask extends AsyncTask<String, Integer, String[]> {
+public class FetchImagesTask extends AsyncTask<String, Integer, List> {
 
     private final String LOG_TAG = FetchImagesTask.class.getSimpleName();
 
-    /*private String[] getImageDataFromJson(String forecastJsonStr)
-            throws JSONException {
+    private List getImageDataFromJson(String JsonStr)
+            throws Exception {
 
-        final String OWM_LIST = "list";
-        final String OWM_WEATHER = "weather";
-        final String OWM_TEMPERATURE = "temp";
-        final String OWM_MAX = "max";
-        final String OWM_MIN = "min";
-        final String OWM_DESCRIPTION = "main";
+        JsonStr = JsonStr.replace("jsonFlickrApi(", "");
+        JsonStr = JsonStr.replace(")", "");
+        InputStream in = new ByteArrayInputStream(JsonStr.getBytes(StandardCharsets.UTF_8));
+        JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
 
-        JSONObject forecastJson = new JSONObject(forecastJsonStr);
-        JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
-
-        String[] resultStrs = new String[numDays];
-        for(int i = 0; i < weatherArray.length(); i++) {
-            // For now, using the format "Day, description, hi/low"
-            String day;
-            String description;
-            String highAndLow;
-
-            // Get the JSON object representing the day
-            JSONObject dayForecast = weatherArray.getJSONObject(i);
-
-            // The date/time is returned as a long.  We need to convert that
-            // into something human-readable, since most people won't read "1400356800" as
-            // "this saturday".
-            long dateTime;
-            // Cheating to convert this to UTC time, which is what we want anyhow
-            dateTime = dayTime.setJulianDay(julianStartDay+i);
-            day = getReadableDateString(dateTime);
-
-            // description is in a child array called "weather", which is 1 element long.
-            JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
-            description = weatherObject.getString(OWM_DESCRIPTION);
-
-            // Temperatures are in a child object called "temp".  Try not to name variables
-            // "temp" when working with temperature.  It confuses everybody.
-            JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-            double high = temperatureObject.getDouble(OWM_MAX);
-            double low = temperatureObject.getDouble(OWM_MIN);
-
-            highAndLow = formatHighLows(high, low);
-            resultStrs[i] = day + " - " + description + " - " + highAndLow;
+        try {
+            return readIDArray(reader);
         }
-
-        for (String s : resultStrs) {
-            Log.v(LOG_TAG, "Forecast entry: " + s);
+        finally {
+            reader.close();
         }
-        return resultStrs;
+    }
 
-    }*/
+    public List readIDArray(JsonReader reader) throws IOException {
+        List IDs = new ArrayList();
+        reader.beginArray();
+        while(reader.hasNext())
+        {
+            IDs.add(readID(reader));
+        }
+        reader.endArray();
+        return IDs;
+    }
+
+    public ID readID(JsonReader reader) throws IOException {
+        String image_id = null;
+        String image_title = null;
+
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if (name.equals("id")) {
+                image_id = reader.nextString();
+            } else if (name.equals(("title"))) {
+                image_title = reader.nextString();
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
+        return new ID(image_id, image_title);
+    }
 
     @Override
-    protected String[] doInBackground(String... Parameters)
+    protected List doInBackground(String... Parameters)
     {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
@@ -142,17 +141,27 @@ public class FetchImagesTask extends AsyncTask<String, Integer, String[]> {
             }
         }
 
-        /*try
+        try
         {
             return getImageDataFromJson(imageJsonStr);
         }
-        catch (JSONException e)
+        catch (Exception e)
         {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
-        }*/
+        }
 
         return null;
     }
 
+    public class ID{
+        public String ID;
+        public String Title;
+
+        public ID (String id, String title)
+        {
+            this.ID = id;
+            this.Title = title;
+        }
+    }
 }

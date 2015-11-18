@@ -15,9 +15,9 @@ import java.util.List;
 
         private List<Image> ImageList;
 
-        public ImageAdapter(List<Image> contactList)
+        public ImageAdapter(List<Image> imageList)
         {
-            this.ImageList = ImageList;
+            this.ImageList = imageList;
         }
 
 

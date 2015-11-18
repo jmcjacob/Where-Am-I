@@ -34,12 +34,15 @@ public class MainActivity extends AppCompatActivity {
         DrawerFragment drawer = (DrawerFragment) getSupportFragmentManager().findFragmentById(R.id.drawer_fragment);
         drawer.setup(R.id.drawer_fragment, (DrawerLayout) findViewById(R.id.drawer_layout), (Toolbar) toolbar);
 
+        FetchImagesTask task = new FetchImagesTask();
+        task.execute("Atherstone");
+
         RecyclerView recList = (RecyclerView) findViewById(R.id.cardview);
         recList.setHasFixedSize(true);
         GridLayoutManager llm = new GridLayoutManager(this,2);
         llm.setOrientation(GridLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
-        ImageAdapter image = new ImageAdapter(createList());
+        ImageAdapter image = new ImageAdapter(task.images);
         recList.setAdapter(image);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -50,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
     }
 
     @Override
@@ -73,12 +75,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private List createList()
-    {
-        FetchImagesTask task = new FetchImagesTask();
-        task.execute("Atherstone");
-        return task.images;
     }
 }

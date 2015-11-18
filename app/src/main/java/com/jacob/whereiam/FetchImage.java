@@ -27,43 +27,23 @@ public class FetchImage extends AsyncTask<ID, Integer, Void> {
     private final String LOG_TAG = FetchImagesTask.class.getSimpleName();
     public Image image = null;
 
-    protected String getImageFromJson(String JsonStr)
-        throws Exception {
+    protected String getImageFromJson(String JsonStr) throws Exception {
 
-            JsonStr = JsonStr.replace("jsonFlickrApi(", "");
-            JsonStr = JsonStr.replace(")", "");
-            InputStream in = new ByteArrayInputStream(JsonStr.getBytes(StandardCharsets.UTF_8));
-            JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
-
-            try {
-                return readImageSRCs(reader);
-            } finally {
-                reader.close();
-            }
-        }
-
-    protected String readImageSRCs(JsonReader reader) throws Exception
-    {
         String src = null;
-        Boolean original = false;
-        reader.beginArray();
-        while (reader.hasNext()) {
-            reader.beginObject();
-            while (reader.hasNext()) {
-                String name = reader.nextName();
-                if (name.equals("lable")){
-                    if (reader.nextString().equals("Original")) {
-                        original = true;
-                    }
-                }
-                if (name.equals("source")){
-                    if (original) {
-                        src = reader.nextString();
-                    }
-                }
+        JsonStr = JsonStr.replace("jsonFlickrApi(", "");
+        JsonStr = JsonStr.replace(")", "");
+
+        JSONObject topobj = new JSONObject(JsonStr);
+        JSONObject innerObj = topobj.getJSONObject("sizes");
+        JSONArray jsonArray = innerObj.getJSONArray("size");
+
+        for (int i = 1; i > jsonArray.length(); i++) {
+            JSONObject size = jsonArray.getJSONObject(i);
+            if (size.getString("label") == "Original") {
+                src = size.getString("source");
             }
         }
-        reader.endArray();
+
         return src;
     }
 

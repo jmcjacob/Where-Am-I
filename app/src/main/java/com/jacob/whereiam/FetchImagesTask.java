@@ -22,6 +22,7 @@ import java.util.List;
 public class FetchImagesTask extends AsyncTask<String, Integer, List<ID>> {
 
     private final String LOG_TAG = FetchImagesTask.class.getSimpleName();
+
     public List<Image> images = null;
 
     private List<ID> getImageDataFromJson(String JsonStr)
@@ -29,45 +30,22 @@ public class FetchImagesTask extends AsyncTask<String, Integer, List<ID>> {
 
         JsonStr = JsonStr.replace("jsonFlickrApi(", "");
         JsonStr = JsonStr.replace(")", "");
-        InputStream in = new ByteArrayInputStream(JsonStr.getBytes(StandardCharsets.UTF_8));
-        JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
+        List<ID> IDs = new ArrayList<ID>();
 
-        try {
-            return readIDArray(reader);
-        }
-        finally {
-            reader.close();
-        }
-    }
+        JSONObject topobj = new JSONObject(JsonStr);
+        JSONObject innerObj = topobj.getJSONObject("photos");
+        JSONArray jsonArray = innerObj.getJSONArray("photo");
 
-    public List readIDArray(JsonReader reader) throws IOException {
-        List<ID> IDs = new ArrayList();
-        reader.beginArray();
-        while(reader.hasNext())
+        for(int i = 0; i < 100; i++)
         {
-            IDs.add(readID(reader));
+            String title = null;
+            String id = null;
+
+            JSONObject photo = jsonArray.getJSONObject(i);
+            IDs.add(new ID(photo.getString("id"),photo.getString("title")));
         }
-        reader.endArray();
+
         return IDs;
-    }
-
-    public ID readID(JsonReader reader) throws IOException {
-        String image_id = null;
-        String image_title = null;
-
-        reader.beginObject();
-        while (reader.hasNext()) {
-            String name = reader.nextName();
-            if (name.equals("id")) {
-                image_id = reader.nextString();
-            } else if (name.equals(("title"))) {
-                image_title = reader.nextString();
-            } else {
-                reader.skipValue();
-            }
-        }
-        reader.endObject();
-        return new ID(image_id, image_title);
     }
 
     @Override
@@ -117,8 +95,6 @@ public class FetchImagesTask extends AsyncTask<String, Integer, List<ID>> {
                 return null;
             }
             imageJsonStr = buffer.toString();
-
-            Log.v(LOG_TAG, "galley string: " + imageJsonStr);
         }
         catch (IOException e)
         {
@@ -158,13 +134,15 @@ public class FetchImagesTask extends AsyncTask<String, Integer, List<ID>> {
     @Override
     protected void onPostExecute(List<ID> IDs)
     {
-        List<Image> images = new ArrayList();
-        for (int i = 0; i > IDs.size(); i++)
-        {
+        List<Image> imagelist = new ArrayList();
+        Log.v(LOG_TAG, "this.images");
+        for (int i = 0; i < IDs.size(); i++) {
+
             FetchImage image = new FetchImage();
             image.execute(IDs.get(i));
             images.add(image.image);
         }
-        this.images = images;
+        this.images = imagelist;
+
     }
 }

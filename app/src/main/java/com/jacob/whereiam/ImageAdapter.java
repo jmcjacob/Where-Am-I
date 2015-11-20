@@ -41,8 +41,6 @@ import java.util.List;
         public void onBindViewHolder(ImageViewHolder imageViewHolder, int i)
         {
             Image ci = ImageList.get(i);
-            Log.v(LOG_TAG, "URL: " + ci.SRC);
-
             BitmapImage bitmapImage = new BitmapImage();
             bitmapImage.execute(ci);
             while (!bitmapImage.isReady()) {
@@ -51,8 +49,8 @@ import java.util.List;
                 }
                 catch (Exception e) {}
             }
-                imageViewHolder.vImage.setImageBitmap(bitmapImage.bitmap);
-                imageViewHolder.vImageTitle.setText(ci.Title);
+            imageViewHolder.vImage.setImageBitmap(bitmapImage.bitmap);
+            imageViewHolder.vImageTitle.setText(ci.Title);
         }
 
         @Override

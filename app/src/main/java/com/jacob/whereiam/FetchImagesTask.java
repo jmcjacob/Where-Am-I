@@ -59,19 +59,17 @@ public class FetchImagesTask extends AsyncTask<String, Integer, List<ID>> {
         {
             final String Flickr_BASE_URL =
                     "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=5e4604aaf0ff1d97a4a621f9b0d06e17";
-            final String TEXT_PARAM = "text";
+            final String LAT_PARAM = "lat";
+            final String LON_PARAM= "lon";
             final String FORMAT_PARAM = "format";
 
             Uri builtUri = Uri.parse(Flickr_BASE_URL).buildUpon()
-                    .appendQueryParameter(TEXT_PARAM, Parameters[0])
+                    .appendQueryParameter(LAT_PARAM, Parameters[0])
+                    .appendQueryParameter(LON_PARAM, Parameters[1])
                     .appendQueryParameter(FORMAT_PARAM, "json")
                     .build();
 
             URL url = new URL(builtUri.toString());
-
-                //https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key=5e4604aaf0ff1d97a4a621f9b0d06e17&photo_id=" + Parameters[1] + "&format=json
-
-            Log.v(LOG_TAG, "Built URI " + url.toString());
 
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");

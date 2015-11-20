@@ -23,7 +23,7 @@ public class FetchImagesTask extends AsyncTask<String, Integer, List<ID>> {
 
     private final String LOG_TAG = FetchImagesTask.class.getSimpleName();
 
-    public List<Image> images = null;
+    public List<Image> images = new ArrayList<>();
 
     private List<ID> getImageDataFromJson(String JsonStr)
             throws Exception {
@@ -36,7 +36,7 @@ public class FetchImagesTask extends AsyncTask<String, Integer, List<ID>> {
         JSONObject innerObj = topobj.getJSONObject("photos");
         JSONArray jsonArray = innerObj.getJSONArray("photo");
 
-        for(int i = 0; i < 100; i++)
+        for(int i = 0; i < 20; i++)
         {
             String title = null;
             String id = null;
@@ -134,15 +134,10 @@ public class FetchImagesTask extends AsyncTask<String, Integer, List<ID>> {
     @Override
     protected void onPostExecute(List<ID> IDs)
     {
-        List<Image> imagelist = new ArrayList();
-        Log.v(LOG_TAG, "this.images");
         for (int i = 0; i < IDs.size(); i++) {
-
             FetchImage image = new FetchImage();
             image.execute(IDs.get(i));
-            images.add(image.image);
         }
-        this.images = imagelist;
 
     }
 }

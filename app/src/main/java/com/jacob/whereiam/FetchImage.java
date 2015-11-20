@@ -29,7 +29,7 @@ public class FetchImage extends AsyncTask<ID, Integer, Void> {
 
     protected String getImageFromJson(String JsonStr) throws Exception {
 
-        String src = null;
+        String src = "";
         JsonStr = JsonStr.replace("jsonFlickrApi(", "");
         JsonStr = JsonStr.replace(")", "");
 
@@ -37,10 +37,11 @@ public class FetchImage extends AsyncTask<ID, Integer, Void> {
         JSONObject innerObj = topobj.getJSONObject("sizes");
         JSONArray jsonArray = innerObj.getJSONArray("size");
 
-        for (int i = 1; i > jsonArray.length(); i++) {
+        for (int i = 1; i < jsonArray.length(); i = i + 1) {
             JSONObject size = jsonArray.getJSONObject(i);
-            if (size.getString("label") == "Original") {
+            if (size.getString("label").equals("Small")) {
                 src = size.getString("source");
+                return src;
             }
         }
 
@@ -67,8 +68,6 @@ public class FetchImage extends AsyncTask<ID, Integer, Void> {
 
             URL url = new URL(builtUri.toString());
 
-            Log.v(LOG_TAG, "Built URI " + url.toString());
-
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
@@ -91,8 +90,6 @@ public class FetchImage extends AsyncTask<ID, Integer, Void> {
                 return null;
             }
             imageJsonStr = buffer.toString();
-
-            Log.v(LOG_TAG, "image string: " + imageJsonStr);
         }
         catch (IOException e)
         {
@@ -127,5 +124,10 @@ public class FetchImage extends AsyncTask<ID, Integer, Void> {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    protected void onPostExecute(Void v){
+        MainActivity.addImage(image);
     }
 }

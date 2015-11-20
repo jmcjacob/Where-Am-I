@@ -24,6 +24,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static RecyclerView recList;
+    public static ImageAdapter image;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,28 +34,25 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        recList = (RecyclerView) findViewById(R.id.cardview);
+        image = new ImageAdapter(new ArrayList<Image>());
+
         DrawerFragment drawer = (DrawerFragment) getSupportFragmentManager().findFragmentById(R.id.drawer_fragment);
         drawer.setup(R.id.drawer_fragment, (DrawerLayout) findViewById(R.id.drawer_layout), (Toolbar) toolbar);
 
         FetchImagesTask task = new FetchImagesTask();
-        task.execute("Atherstone");
+        task.execute("Lincoln, UK");
 
-        RecyclerView recList = (RecyclerView) findViewById(R.id.cardview);
-        recList.setHasFixedSize(true);
+        this.recList.setHasFixedSize(true);
         GridLayoutManager llm = new GridLayoutManager(this,2);
         llm.setOrientation(GridLayoutManager.VERTICAL);
-        recList.setLayoutManager(llm);
-        ImageAdapter image = new ImageAdapter(task.images);
-        recList.setAdapter(image);
+        this.recList.setLayoutManager(llm);
+        this.recList.setAdapter(this.image);
+    }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+    public static void addImage(Image _image) {
+        MainActivity.image.ImageList.add(_image);
+        MainActivity.recList.setAdapter(MainActivity.image);
     }
 
     @Override

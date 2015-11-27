@@ -1,38 +1,28 @@
 package com.jacob.whereiam;
 
+import android.content.Context;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity  implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity {
 
-    private final String LOG_TAG = MainActivity.class.getSimpleName();
+    //private final String LOG_TAG = MainActivity.class.getSimpleName();
     public static RecyclerView recList;
     public static ImageAdapter image;
-    protected GoogleApiClient mGoogleApiClient;
-    protected Location mLastLocation = null;
-    protected String mLatitudeLabel;
-    protected String mLongitudeLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        buildGoogleApiClient();
-        mGoogleApiClient.connect();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -45,18 +35,27 @@ public class MainActivity extends AppCompatActivity  implements
         DrawerFragment drawer = (DrawerFragment) getSupportFragmentManager().findFragmentById(R.id.drawer_fragment);
         drawer.setup(R.id.drawer_fragment, (DrawerLayout) findViewById(R.id.drawer_layout), (Toolbar) toolbar);
 
-        while(mLastLocation == null) {
-            try {
-            wait();
-            } catch (Exception e){}
+        double lat = 0;
+        double longi = 0;
+        try {
+            LocationListener locationListener = new MyLocationListener();
+            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 35000, 10, locationListener);
+            String locationProvider = lm.GPS_PROVIDER;
+            Location lastKnownLocation = lm.getLastKnownLocation(locationProvider);
+
+            lat = lastKnownLocation.getLatitude();
+            longi = lastKnownLocation.getLongitude();
+        }catch(SecurityException e){
+
         }
-        setImages();
+        setImages(lat, longi);
     }
 
-    public void setImages() {
+    public void setImages(double lat, double longi) {
 
         FetchImagesTask task = new FetchImagesTask();
-        task.execute(String.valueOf(this.mLastLocation.getLatitude()), String.valueOf(this.mLastLocation.getLongitude()));
+        task.execute(String.valueOf(lat), String.valueOf(longi));
         this.recList.setHasFixedSize(true);
         GridLayoutManager llm = new GridLayoutManager(this, 2);
         llm.setOrientation(GridLayoutManager.VERTICAL);
@@ -78,62 +77,22 @@ public class MainActivity extends AppCompatActivity  implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
-        return super.onOptionsItemSelected(item);
+        return false;
     }
 
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null) {
-        } else {
-            Toast.makeText(this, "No Location", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
-        // onConnectionFailed.
-        Log.i(LOG_TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        // The connection to Google Play services was lost for some reason. We call connect() to
-        // attempt to re-establish the connection.
-        Log.i(LOG_TAG, "Connection suspended");
-        mGoogleApiClient.connect();
+    private final class MyLocationListener implements LocationListener {
+        @Override
+        public void onLocationChanged(Location locFromGps) {}
+        @Override
+        public void onProviderDisabled(String provider) {}
+        @Override
+        public void onProviderEnabled(String provider) {}
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
     }
 }

@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         double[] location = getLocation();
         FetchThumbnails task = new FetchThumbnails();
         task.execute(String.valueOf(location[0]), String.valueOf(location[1]));
-        this.recList.setHasFixedSize(true);
+        this.recList.setHasFixedSize(false);
         GridLayoutManager llm = new GridLayoutManager(this, 2);
         llm.setOrientation(GridLayoutManager.VERTICAL);
         this.recList.setLayoutManager(llm);
@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_refresh)  {
+            GridLayoutManager layout = (GridLayoutManager)this.recList.getLayoutManager();
+            layout.removeAllViews();
             setImages();
         }
         return false;

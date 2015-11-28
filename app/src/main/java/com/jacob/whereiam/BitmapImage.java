@@ -17,8 +17,7 @@ public class BitmapImage extends AsyncTask<Image, Void, Void> {
     private final String LOG_TAG = BitmapImage.class.getSimpleName();
     Bitmap bitmap = null;
 
-    protected Void doInBackground(Image... image)
-    {
+    protected Void doInBackground(Image... image) {
         Bitmap myBitmap = null;
         try {
             URL url = new URL(image[0].SRC);
@@ -37,8 +36,7 @@ public class BitmapImage extends AsyncTask<Image, Void, Void> {
         return null;
     }
 
-    protected Boolean isReady()
-    {
+    protected Boolean isReady() {
         if (bitmap != null)
             return true;
         else

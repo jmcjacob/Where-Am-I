@@ -10,14 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    //private final String LOG_TAG = MainActivity.class.getSimpleName();
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
     public static RecyclerView recList;
     public static ImageAdapter image;
 
@@ -33,29 +33,16 @@ public class MainActivity extends AppCompatActivity {
         image = new ImageAdapter(new ArrayList<Image>());
 
         DrawerFragment drawer = (DrawerFragment) getSupportFragmentManager().findFragmentById(R.id.drawer_fragment);
-        drawer.setup(R.id.drawer_fragment, (DrawerLayout) findViewById(R.id.drawer_layout), (Toolbar) toolbar);
+        drawer.setup(R.id.drawer_fragment, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
 
-        double lat = 0;
-        double longi = 0;
-        try {
-            LocationListener locationListener = new MyLocationListener();
-            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 35000, 10, locationListener);
-            String locationProvider = lm.GPS_PROVIDER;
-            Location lastKnownLocation = lm.getLastKnownLocation(locationProvider);
-
-            lat = lastKnownLocation.getLatitude();
-            longi = lastKnownLocation.getLongitude();
-        }catch(SecurityException e){
-
-        }
-        setImages(lat, longi);
+        setImages();
     }
 
-    public void setImages(double lat, double longi) {
+    public void setImages() {
 
-        FetchImagesTask task = new FetchImagesTask();
-        task.execute(String.valueOf(lat), String.valueOf(longi));
+        double[] location = getLocation();
+        FetchThumbnails task = new FetchThumbnails();
+        task.execute(String.valueOf(location[0]), String.valueOf(location[1]));
         this.recList.setHasFixedSize(true);
         GridLayoutManager llm = new GridLayoutManager(this, 2);
         llm.setOrientation(GridLayoutManager.VERTICAL);
@@ -82,7 +69,29 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
+        if (id == R.id.action_refresh)  {
+            setImages();
+        }
         return false;
+    }
+
+    public double[] getLocation() {
+        double lat = 0;
+        double longi = 0;
+        try {
+           LocationListener locationListener = new MyLocationListener();
+            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 35000, 10, locationListener);
+            String locationProvider = lm.GPS_PROVIDER;
+            Location lastKnownLocation = lm.getLastKnownLocation(locationProvider);
+
+            lat = lastKnownLocation.getLatitude();
+            longi = lastKnownLocation.getLongitude();
+        }catch(SecurityException e){
+            Log.e(LOG_TAG, "Error ", e);
+        }
+        double[] location = {lat, longi};
+        return location;
     }
 
     private final class MyLocationListener implements LocationListener {

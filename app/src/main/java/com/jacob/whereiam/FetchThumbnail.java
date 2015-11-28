@@ -1,55 +1,45 @@
 package com.jacob.whereiam;
-
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.JsonReader;
 import android.util.Log;
+
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
-public class FetchImagesTask extends AsyncTask<String, Integer, List<ID>> {
+public class FetchThumbnail extends AsyncTask<Image, Integer, Void> {
 
-    private final String LOG_TAG = FetchImagesTask.class.getSimpleName();
+    private final String LOG_TAG = FetchThumbnails.class.getSimpleName();
+    public Image image = null;
 
-    public List<Image> images = new ArrayList<>();
+    protected String getImageFromJson(String JsonStr) throws Exception {
 
-    private List<ID> getImageDataFromJson(String JsonStr)
-            throws Exception {
-
+        String src = "";
         JsonStr = JsonStr.replace("jsonFlickrApi(", "");
         JsonStr = JsonStr.replace(")", "");
-        List<ID> IDs = new ArrayList<ID>();
 
         JSONObject topobj = new JSONObject(JsonStr);
-        JSONObject innerObj = topobj.getJSONObject("photos");
-        JSONArray jsonArray = innerObj.getJSONArray("photo");
+        JSONObject innerObj = topobj.getJSONObject("sizes");
+        JSONArray jsonArray = innerObj.getJSONArray("size");
 
-        for(int i = 0; i < 20; i++)
-        {
-            String title = null;
-            String id = null;
-
-            JSONObject photo = jsonArray.getJSONObject(i);
-            IDs.add(new ID(photo.getString("id"),photo.getString("title")));
+        for (int i = 1; i < jsonArray.length(); i = i + 1) {
+            JSONObject size = jsonArray.getJSONObject(i);
+            if (size.getString("label").equals("Thumbnail")) {
+                src = size.getString("source");
+                return src;
+            }
         }
 
-        return IDs;
+        return src;
     }
 
-    @Override
-    protected List<ID> doInBackground(String... Parameters)
+    protected Void doInBackground(Image... id)
     {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
@@ -58,14 +48,12 @@ public class FetchImagesTask extends AsyncTask<String, Integer, List<ID>> {
         try
         {
             final String Flickr_BASE_URL =
-                    "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=5e4604aaf0ff1d97a4a621f9b0d06e17";
-            final String LAT_PARAM = "lat";
-            final String LON_PARAM= "lon";
+                    "https://api.flickr.com/services/rest/?method=flickr.photos.getSizes&api_key=5e4604aaf0ff1d97a4a621f9b0d06e17";
+            final String TEXT_PARAM = "photo_id";
             final String FORMAT_PARAM = "format";
 
             Uri builtUri = Uri.parse(Flickr_BASE_URL).buildUpon()
-                    .appendQueryParameter(LAT_PARAM, Parameters[0])
-                    .appendQueryParameter(LON_PARAM, Parameters[1])
+                    .appendQueryParameter(TEXT_PARAM, id[0].ID)
                     .appendQueryParameter(FORMAT_PARAM, "json")
                     .build();
 
@@ -118,24 +106,20 @@ public class FetchImagesTask extends AsyncTask<String, Integer, List<ID>> {
 
         try
         {
-            return getImageDataFromJson(imageJsonStr);
+            id[0].setSRC(getImageFromJson(imageJsonStr));
+            this.image = id[0];
+            return null;
         }
         catch (Exception e)
         {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
+            return null;
         }
-
-        return null;
     }
 
     @Override
-    protected void onPostExecute(List<ID> IDs)
-    {
-        for (int i = 0; i < IDs.size(); i++) {
-            FetchImage image = new FetchImage();
-            image.execute(IDs.get(i));
-        }
-
+    protected void onPostExecute(Void v){
+        MainActivity.addImage(image);
     }
 }

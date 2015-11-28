@@ -3,12 +3,13 @@ package com.jacob.whereiam;
 public class Image {
     protected String Title;
     protected String SRC;
-    protected static final String TITLE_PREFIX = "Title_";
-    protected static final String SRC_PREFIX = "SRC_";
+    public String ID;
 
-    public Image(String title, String src)
-    {
+    public Image(String title, String id) {
         this.Title = title;
+        this.ID = id;
+    }
+    public void setSRC(String src) {
         this.SRC = src;
     }
 }

@@ -28,8 +28,7 @@ public class DrawerFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mUserDrawer = Boolean.valueOf(readPrefrence(getActivity(),KEY_USER_LEARNED_DRAWER,"false"));
         mSavedInstance = savedInstanceState !=null ? true : false;
@@ -48,11 +47,9 @@ public class DrawerFragment extends Fragment {
         mDrawerLayout = drawerLayout;
         mDrawerToggle = new ActionBarDrawerToggle(getActivity(), drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
             @Override
-            public void onDrawerOpened(View drawerView)
-            {
+            public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                if(!mUserDrawer)
-                {
+                if(!mUserDrawer) {
                     mUserDrawer=true;
                     savePrefrence(getActivity(), KEY_USER_LEARNED_DRAWER, mUserDrawer+"");
                 }
@@ -60,22 +57,19 @@ public class DrawerFragment extends Fragment {
             }
 
             @Override
-            public void onDrawerClosed(View drawerView)
-            {
+            public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
                 getActivity().invalidateOptionsMenu();
             }
 
             @Override
-            public void onDrawerSlide(View drawerView, float slidOffset)
-            {
+            public void onDrawerSlide(View drawerView, float slidOffset) {
                 if(slidOffset<0.6)
                     toolbar.setAlpha(1-slidOffset);
             }
         };
 
-        if(!mUserDrawer&&!mSavedInstance)
-        {
+        if(!mUserDrawer&&!mSavedInstance) {
             mDrawerLayout.openDrawer(container);
         }
 
@@ -88,16 +82,14 @@ public class DrawerFragment extends Fragment {
         });
     }
 
-    public static void savePrefrence(Context context, String prefName, String prefValue)
-    {
+    public static void savePrefrence(Context context, String prefName, String prefValue) {
         SharedPreferences sharedPreferences=context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.putString(prefName, prefValue);
         editor.apply();
     }
 
-    public static String readPrefrence(Context context, String prefName, String defaultVal)
-    {
+    public static String readPrefrence(Context context, String prefName, String defaultVal) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
         return sharedPreferences.getString(prefName,defaultVal);
     }

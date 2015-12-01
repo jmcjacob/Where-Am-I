@@ -12,11 +12,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 public class FetchImages extends AsyncTask<String, Integer, Void> {
-
     private final String LOG_TAG = FetchImages.class.getSimpleName();
     public boolean finished = false;
+    public Integer images = 10;
 
     private Void getImageDataFromJson(String JsonStr) throws Exception {
         JsonStr = JsonStr.replace("jsonFlickrApi(", "");
@@ -29,24 +30,11 @@ public class FetchImages extends AsyncTask<String, Integer, Void> {
         Log.v(LOG_TAG, "Got JSON wrtitng to SQL");
 
         try {
-            for (int i = 0; i < 30; i++) {
+            for (int i = 0; i < images; i++) {
                 JSONObject photo = jsonArray.getJSONObject(i);
                 String[] temp = {photo.getString("title"), photo.getString("id")};
-
-                //String query = "SELECT ID FROM IMAGES WHERE ID=" + temp[1] + ";";
-                //Cursor c = MainActivity.database.rawQuery(query, null);
-                //if (c.moveToFirst()) {
-                    //if (c.getString(c.getColumnIndex("ID")) == null || c.getString(c.getColumnIndex("ID")).equals("")) {
-                        Log.v(LOG_TAG, "Writing to SQL");
-                        MainActivity.database.execSQL("INSERT INTO IMAGES (TITLE, ID) VALUES (\"" + temp[0] + "\",\"" + temp[1] + "\");");
-                        FetchImage task = new FetchImage();
-                        task.execute(temp);
-                        while (!task.finished) {
-                            wait();
-                        }
-                    //}
-                //}
-                //c.close();
+                Log.v(LOG_TAG, "Writing to SQL");
+                MainActivity.database.execSQL("INSERT INTO IMAGES (TITLE, ID) VALUES (\"" + temp[0] + "\",\"" + temp[1] + "\");");
             }
             return null;
         }
@@ -125,6 +113,9 @@ public class FetchImages extends AsyncTask<String, Integer, Void> {
 
     @Override
     protected void onPostExecute(Void V) {
+        FetchImage task = new FetchImage();
+        task.images = images;
+        task.execute();
         finished = true;
     }
 }

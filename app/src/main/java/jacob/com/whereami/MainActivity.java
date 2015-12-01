@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationRequest;
 import com.jacob.whereiam.R;
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private final String LOG_TAG = MainActivity.class.getSimpleName();
     public static RecyclerView recList;
     public static SQLiteDatabase database;
-    public Location location = null;
+    public Location dive = null;
     //public static ImageAdapter image;
 
     @Override
@@ -40,39 +41,26 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         database = openOrCreateDatabase("Image_Database", MODE_PRIVATE, null);
         database.execSQL("CREATE TABLE IF NOT EXISTS IMAGES(TITLE VARCHAR,ID VARCHAR, THUMBNAIL VARCHAR, SOURCE VARCHAR);");
-        LocationListener locationListener = new MyLocationListener();
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        //if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-        //    android.os.Process.killProcess(android.os.Process.myPid());
-        //    System.exit(1);
-        //}
-        //else {
-        //    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 35000, 10, locationListener);
-        //}
-
-        while (location == null) {}
-        Log.v(LOG_TAG, String.valueOf(location.getLatitude()));
-
+        FetchImages task = new FetchImages();
+        task.execute("0", "1");
     }
-
-    private final class MyLocationListener implements LocationListener {
-
-        @Override
-        public void onLocationChanged(Location locFromGps) {
-            location = locFromGps;
-        }
-        @Override
-        public void onProviderDisabled(String provider) {
-            // called when the GPS provider is turned off (user turning off the GPS on the phone)
-        }
-        @Override
-        public void onProviderEnabled(String provider) {
-            // called when the GPS provider is turned on (user turning on the GPS on the phone)
-        }
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-            // called when the status of the GPS provider changes
-        }
+    /*
+    private void enableGPS(){
+        LocationManager locationManager=(LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        LocationListener locationListener=new LocationListener(){
+            public void onLocationChanged(    Location location){
+                dive.setLongitude(location.getLongitude());
+                dive.setLatitude(location.getLatitude());
+            }
+            public void onStatusChanged(    String provider,    int status,    Bundle extras){
+            }
+            public void onProviderEnabled(    String provider){
+            }
+            public void onProviderDisabled(    String provider){
+            }
+        };
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
     }
+    */
 }

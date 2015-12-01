@@ -107,5 +107,6 @@ public class FetchImage extends AsyncTask<String[], Void, Void> {
     @Override
     protected void onPostExecute(Void v){
         finished = true;
+        Log.v(LOG_TAG, "Finished an image");
     }
 }

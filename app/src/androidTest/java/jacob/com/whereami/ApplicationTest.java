@@ -1,4 +1,4 @@
-package com.jacob.whereiam;
+package jacob.com.whereami;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

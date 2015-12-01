@@ -1,5 +1,6 @@
-package com.jacob.whereiam;
+package jacob.com.whereami;
 
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -11,52 +12,68 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
-public class FetchThumbnails extends AsyncTask<String, Integer, List<Image>> {
+public class FetchImages extends AsyncTask<String, Integer, Void> {
 
-    private final String LOG_TAG = FetchThumbnails.class.getSimpleName();
+    private final String LOG_TAG = FetchImages.class.getSimpleName();
+    public boolean finished = false;
 
-    private List<Image> getImageDataFromJson(String JsonStr)
-            throws Exception {
-
+    private Void getImageDataFromJson(String JsonStr) throws Exception {
         JsonStr = JsonStr.replace("jsonFlickrApi(", "");
         JsonStr = JsonStr.replace(")", "");
-        List<Image> IDs = new ArrayList<>();
 
         JSONObject topobj = new JSONObject(JsonStr);
         JSONObject innerObj = topobj.getJSONObject("photos");
         JSONArray jsonArray = innerObj.getJSONArray("photo");
 
-        for(int i = 0; i < 30; i++) {
-            JSONObject photo = jsonArray.getJSONObject(i);
-            IDs.add(new Image(photo.getString("title"),photo.getString("id")));
+        try {
+            for (int i = 0; i < 30; i++) {
+                JSONObject photo = jsonArray.getJSONObject(i);
+                String[] temp = {photo.getString("title"), photo.getString("id")};
+
+                String query = "SELECT ID FROM IMAGES WHERE ID=\"" + temp[1] + "\";";
+                Cursor c = MainActivity.database.rawQuery(query, null);
+                if (c.moveToFirst()) {
+                    if (c.getString(c.getColumnIndex("ID")) != null || !c.getString(c.getColumnIndex("ID")).equals("")) {
+                        MainActivity.database.execSQL("INSERT INTO IMAGES (\"" + temp[0] + "\",\"" + temp[1] + "\");");
+                        FetchImage task = new FetchImage();
+                        task.execute(temp);
+                        while (!task.finished) {
+                            wait();
+                        }
+                    }
+                }
+                c.close();
+            }
+            return null;
         }
-        return IDs;
+        catch (Exception e) {
+            Log.e(LOG_TAG, "FetchImages ERROR: " + e);
+            return null;
+        }
     }
 
     @Override
-    protected List<Image> doInBackground(String... Parameters) {
+    protected Void doInBackground(String... Parameters) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
         String imageJsonStr = null;
 
         try {
-            final String Flickr_BASE_URL =
-                    "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=5e4604aaf0ff1d97a4a621f9b0d06e17";
+            final String Flickr_BASE_URL = "https://api.flickr.com/services/rest/?method=flickr.photos.search";
+            final String API_PARAM = "api_key";
             final String LAT_PARAM = "lat";
             final String LON_PARAM= "lon";
             final String FORMAT_PARAM = "format";
 
             Uri builtUri = Uri.parse(Flickr_BASE_URL).buildUpon()
+                    .appendQueryParameter(API_PARAM, "5e4604aaf0ff1d97a4a621f9b0d06e17")
                     .appendQueryParameter(LAT_PARAM, Parameters[0])
                     .appendQueryParameter(LON_PARAM, Parameters[1])
                     .appendQueryParameter(FORMAT_PARAM, "json")
                     .build();
 
             URL url = new URL(builtUri.toString());
-
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
@@ -93,7 +110,6 @@ public class FetchThumbnails extends AsyncTask<String, Integer, List<Image>> {
                 }
             }
         }
-
         try {
             return getImageDataFromJson(imageJsonStr);
         }
@@ -101,17 +117,11 @@ public class FetchThumbnails extends AsyncTask<String, Integer, List<Image>> {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
-
         return null;
     }
 
     @Override
-    protected void onPostExecute(List<Image> IDs)
-    {
-        for (int i = 0; i < IDs.size(); i++) {
-            FetchThumbnail image = new FetchThumbnail();
-            image.execute(IDs.get(i));
-        }
-
+    protected void onPostExecute(Void V) {
+        finished = true;
     }
 }

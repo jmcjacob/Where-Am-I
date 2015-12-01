@@ -1,4 +1,4 @@
-package com.jacob.whereiam;
+package jacob.com.whereami;
 
 import org.junit.Test;
 

@@ -9,12 +9,12 @@
     android:layout_margin="5dp">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/image"
-            android:layout_width="200dp"
+            android:layout_width="150dp"
             android:layout_height="150dp"
             android:src="@drawable/kitten"
             android:gravity="center_vertical" />
@@ -23,9 +23,9 @@
             android:id="@+id/image_title"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="No Network Connection"
+            android:text="@string/no_network"
             android:textColor="#000000"
-            android:textSize="9dp"
+            android:textSize="12sp"
             android:padding="10dp"
             android:gravity="center_vertical"
             android:textAlignment="center"

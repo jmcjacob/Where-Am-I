@@ -11,5 +11,6 @@
     <string name="loading">Loading...</string>
     <string name="no_network">Could Not Load Image</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="prefrence_file">jacob.com.whereami.PREFERENCE</string>
 
 </resources>

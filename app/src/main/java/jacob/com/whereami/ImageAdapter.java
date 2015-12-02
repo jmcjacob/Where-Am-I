@@ -21,7 +21,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
     @Override
     public int getItemCount() {
-        String countQuery = "SELECT  * FROM " + "IMAGES;";
+        String countQuery = "SELECT * FROM IMAGES;";
         Cursor cursor = MainActivity.database.rawQuery(countQuery, null);
         int count = cursor.getCount();
         cursor.close();

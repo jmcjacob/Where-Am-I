@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -15,10 +16,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     public static RecyclerView recList;
     public static SQLiteDatabase database;
     public static ImageAdapter image;
+    public static SwipeRefreshLayout swipe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +57,30 @@ public class MainActivity extends AppCompatActivity {
         glm.setOrientation(GridLayoutManager.VERTICAL);
         recList.setLayoutManager(glm);
         recList.setItemViewCacheSize(25);
+
+        try {
+            swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    TextView textView = (TextView)findViewById(R.id.network);
+                    textView.setVisibility(View.VISIBLE);
+                    refresh();
+                    Log.v(LOG_TAG, "Finished Refresh");
+                    swipe.setRefreshing(false);
+                }
+            });
+        }
+        catch (Exception e) {
+            Log.e(LOG_TAG, "swipe: " + e);
+        }
+
+        if (isLocationServiceEnabled()) {
+            Log.v(LOG_TAG, "MainActivity: Location Enabled");
+        }
+        else {
+            Log.e(LOG_TAG, "MainActivity: Location Disabled");
+        }
+
         refresh();
     }
 
@@ -81,13 +109,19 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        database.close();
+    }
+
     private boolean refresh() {
         if (isNetworkAvailable()) {
             database.execSQL("CREATE TABLE IF NOT EXISTS IMAGES(TITLE VARCHAR,ID VARCHAR, THUMBNAIL VARCHAR, SOURCE VARCHAR);");
             database.execSQL("DELETE FROM IMAGES;");
             FetchImages task = new FetchImages();
             task.images = 50;
-            task.execute("52.576614", "-1.543763");
+            task.execute("50.0", "50.0");
             return true;
         }
         else {
@@ -95,11 +129,6 @@ public class MainActivity extends AppCompatActivity {
             textView.setText("No Network Connection");
             return false;
         }
-    }
-
-    public static void disableLoading() {
-        TextView textView = (TextView)MainActivity.context.findViewById(R.id.network);
-        textView.setVisibility(View.INVISIBLE);
     }
 
     /*
@@ -123,9 +152,26 @@ public class MainActivity extends AppCompatActivity {
     */
 
     private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        }
+        catch (Exception e) {
+            Log.e(LOG_TAG, "isNetworkAvailable: " + e);
+            return false;
+        }
+    }
+
+    private boolean isLocationServiceEnabled() {
+        try {
+            LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            String provider = lm.getBestProvider(new Criteria(), true);
+            return (!TextUtils.isEmpty(provider) && !LocationManager.PASSIVE_PROVIDER.equals(provider));
+        }
+        catch (Exception e) {
+            Log.e(LOG_TAG, "isLocationServiceEnabled: " + e);
+            return false;
+        }
     }
 }

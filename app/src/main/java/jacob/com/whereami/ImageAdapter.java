@@ -32,7 +32,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     public void onBindViewHolder(ImageViewHolder imageViewHolder, int i) {
         String src = "@drawable/kitten.jpg";
         String title = "Failed";
-        MainActivity.disableLoading();
+        TextView textView = (TextView)MainActivity.context.findViewById(R.id.network);
+        textView.setVisibility(View.INVISIBLE);
         try {
             Cursor c = MainActivity.database.rawQuery("SELECT THUMBNAIL FROM IMAGES", null);
             if (c.moveToFirst()) {

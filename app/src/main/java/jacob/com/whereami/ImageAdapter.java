@@ -1,5 +1,6 @@
 package jacob.com.whereami;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
@@ -66,12 +67,25 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         View item = LayoutInflater
                 .from(viewGroup.getContext())
                 .inflate(R.layout.card_layout, viewGroup, false);
+        item.setOnClickListener(new MyOnClickListener());
         return new ImageViewHolder(item);
     }
 
+    class MyOnClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            int itemPosition = MainActivity.recList.getChildPosition(v);
+            Log.v(LOG_TAG, " " + String.valueOf(itemPosition));
+                Intent intent = new Intent(MainActivity.context, ImageActivity.class);
+                
+                MainActivity.context.startActivity(intent);
+
+        }
+    }
+
     public static class ImageViewHolder extends RecyclerView.ViewHolder {
-        protected ImageView vImage;
-        protected TextView vTitle;
+        public ImageView vImage;
+        public TextView vTitle;
 
         public ImageViewHolder(View v) {
             super(v);

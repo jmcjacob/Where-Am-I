@@ -63,6 +63,7 @@ public class FetchImage extends AsyncTask<Void, Void, Boolean> {
         Cursor c = MainActivity.database.rawQuery(query, null);
         c.moveToFirst();
         for (int i = 0; i < images; i ++) {
+            Log.v(LOG_TAG, String.valueOf(IDs));
             IDs[i] = c.getString(c.getColumnIndex("ID"));
             if(!c.moveToNext())
                 break;

@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,10 +32,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     public void onBindViewHolder(ImageViewHolder imageViewHolder, int i) {
         String src = "@drawable/kitten.jpg";
         String title = "Failed";
-
+        MainActivity.disableLoading();
         try {
-            String selectQuery = "SELECT THUMBNAIL FROM IMAGES";
-            Cursor c = MainActivity.database.rawQuery(selectQuery, null);
+            Cursor c = MainActivity.database.rawQuery("SELECT THUMBNAIL FROM IMAGES", null);
             if (c.moveToFirst()) {
                 for (int j = 0; j <= i; j++) {
                     c.moveToNext();
@@ -41,7 +42,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                 src = c.getString(c.getColumnIndex("THUMBNAIL"));
             }
             c.close();
-            Cursor d = MainActivity.database.rawQuery(selectQuery, null);
+            Cursor d = MainActivity.database.rawQuery("SELECT TITLE FROM IMAGES", null);
             if (d.moveToFirst()) {
                 for (int j = 0; j <= i; j++) {
                     d.moveToNext();

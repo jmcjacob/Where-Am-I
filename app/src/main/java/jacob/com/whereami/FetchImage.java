@@ -4,6 +4,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.TextView;
+
+import com.jacob.whereiam.R;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
@@ -22,6 +26,10 @@ public class FetchImage extends AsyncTask<Void, Void, Boolean> {
     protected Void getImageFromJson(String JsonStr, String ID) throws Exception {
         JsonStr = JsonStr.replace("jsonFlickrApi(", "");
         JsonStr = JsonStr.replace(")", "");
+        String thumbnail = null;
+        String large = null;
+        String original = null;
+        String update = null;
 
         JSONObject topobj = new JSONObject(JsonStr);
         JSONObject innerObj = topobj.getJSONObject("sizes");
@@ -29,17 +37,20 @@ public class FetchImage extends AsyncTask<Void, Void, Boolean> {
 
         for (int i = 1; i < jsonArray.length(); i = i + 1) {
             JSONObject size = jsonArray.getJSONObject(i);
-            if (size.getString("label").equals("Thumbnail")) {
-                Log.v(LOG_TAG, "Writing Thumbnail");
-                String update = "UPDATE IMAGES SET THUMBNAIL = \"" + size.getString("source") + "\" WHERE ID = \"" + ID + "\";";
-                MainActivity.database.execSQL(update);
+            if (size.getString("label").equals("Small")) {
+                thumbnail = size.getString("source");
+            }else if (size.getString("label").equals("Large")) {
+                large = size.getString("source");
             }
             else if (size.getString("label").equals("Original")) {
-                Log.v(LOG_TAG, "Writing Original");
-                String update = "UPDATE IMAGES SET SOURCE = \"" + size.getString("source") + "\" WHERE ID = \"" + ID + "\";";
-                MainActivity.database.execSQL(update);
+                original = size.getString("source");
             }
         }
+        if (original!=null)
+            update = "UPDATE IMAGES SET THUMBNAIL = \"" + thumbnail + "\", SOURCE = \"" + original + "\" WHERE ID = \"" + ID + "\";";
+        else
+            update = "UPDATE IMAGES SET THUMBNAIL = \"" + thumbnail + "\", SOURCE = \"" + large + "\" WHERE ID = \"" + ID + "\";";
+        MainActivity.database.execSQL(update);
         return null;
     }
 
@@ -53,7 +64,7 @@ public class FetchImage extends AsyncTask<Void, Void, Boolean> {
         c.moveToFirst();
         for (int i = 0; i < images; i ++) {
             IDs[i] = c.getString(c.getColumnIndex("ID"));
-            if(!c.moveToLast())
+            if(!c.moveToNext())
                 break;
         }
 

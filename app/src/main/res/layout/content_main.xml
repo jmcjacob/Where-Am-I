@@ -26,11 +26,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/locationText"
         android:textSize="30sp"
-        android:visibility="invisible"
         android:gravity="center_horizontal"
         android:layout_centerInParent="true"
         android:layout_centerHorizontal="true"
-        android:text="@string/no_network"
+        android:text="@string/loading"
         android:id="@+id/network"/>
     
     <android.support.v7.widget.RecyclerView

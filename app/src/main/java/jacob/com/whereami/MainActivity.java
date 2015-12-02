@@ -1,6 +1,7 @@
 package jacob.com.whereami;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
@@ -33,25 +34,51 @@ import com.jacob.whereiam.R;
 public class MainActivity extends AppCompatActivity {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
-    GoogleApiClient mGoogleApiClient;
+    public static Activity context;
     public static RecyclerView recList;
     public static SQLiteDatabase database;
-    public Location dive = null;
     public static ImageAdapter image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        context = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         database = openOrCreateDatabase("Image_Database", MODE_PRIVATE, null);
         recList = (RecyclerView) findViewById(R.id.card_view);
-        recList.setHasFixedSize(false);
+        recList.setHasFixedSize(true);
         GridLayoutManager glm = new GridLayoutManager(this, 2);
         glm.setOrientation(GridLayoutManager.VERTICAL);
-        this.recList.setLayoutManager(glm);
+        recList.setLayoutManager(glm);
+        recList.setItemViewCacheSize(25);
         refresh();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        if (id == R.id.action_about) {
+            return true;
+        }
+        if (id == R.id.action_refresh)  {
+            GridLayoutManager layout = (GridLayoutManager)recList.getLayoutManager();
+            layout.removeAllViews();
+            TextView textView = (TextView)findViewById(R.id.network);
+            textView.setVisibility(View.VISIBLE);
+            refresh();
+        }
+        return false;
     }
 
     private boolean refresh() {
@@ -59,15 +86,20 @@ public class MainActivity extends AppCompatActivity {
             database.execSQL("CREATE TABLE IF NOT EXISTS IMAGES(TITLE VARCHAR,ID VARCHAR, THUMBNAIL VARCHAR, SOURCE VARCHAR);");
             database.execSQL("DELETE FROM IMAGES;");
             FetchImages task = new FetchImages();
-            task.images = 30;
-            task.execute("0","0");
+            task.images = 50;
+            task.execute("52.576614", "-1.543763");
             return true;
         }
         else {
             TextView textView = (TextView)findViewById(R.id.network);
-            textView.setVisibility(View.VISIBLE);
+            textView.setText("No Network Connection");
             return false;
         }
+    }
+
+    public static void disableLoading() {
+        TextView textView = (TextView)MainActivity.context.findViewById(R.id.network);
+        textView.setVisibility(View.INVISIBLE);
     }
 
     /*

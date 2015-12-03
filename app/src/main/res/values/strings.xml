@@ -15,5 +15,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="prefrence_file">jacob.com.whereami.PREFERENCE</string>
     <string name="share">Share Image with..</string>
+    <string name="title_activity_about">AboutActivity</string>
+    <string name="plea">Jacob is very hard working and hopes to get a good grade for his Mobile Computing work.</string>
 
 </resources>

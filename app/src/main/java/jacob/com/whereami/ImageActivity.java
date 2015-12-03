@@ -1,6 +1,5 @@
 package jacob.com.whereami;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -11,19 +10,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
-import android.widget.ShareActionProvider;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import com.jacob.whereiam.R;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 public class ImageActivity extends AppCompatActivity {
 
     private final String LOG_TAG = ImageActivity.class.getSimpleName();
-    private ShareActionProvider mShareActionProvider;
     public String title;
     public String src;
     public Bitmap image;
@@ -66,6 +57,7 @@ public class ImageActivity extends AppCompatActivity {
             Log.e(LOG_TAG, "FectchBitmap in ImageActivity: " + e);
 
         }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -114,7 +106,7 @@ public class ImageActivity extends AppCompatActivity {
         }
     }
 
-    private File getOutputMediaFile(){
+    public File getOutputMediaFile(){
         File mediaStorageDir = new File(Environment.getExternalStorageDirectory() + "/Pictures");
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){

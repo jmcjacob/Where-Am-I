@@ -45,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends AppCompatActivity {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
+    public final static String EXTRA_MESSAGE = "jacob.com.whereami.MESSAGE";
     public static Activity context;
     public static RecyclerView recList;
     public static SQLiteDatabase database;

@@ -1,5 +1,7 @@
 package jacob.com.whereami;
 
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -36,22 +38,15 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         TextView textView = (TextView)MainActivity.context.findViewById(R.id.network);
         textView.setVisibility(View.INVISIBLE);
         try {
-            Cursor c = MainActivity.database.rawQuery("SELECT THUMBNAIL FROM IMAGES", null);
+            Cursor c = MainActivity.database.rawQuery("SELECT * FROM IMAGES", null);
             if (c.moveToFirst()) {
-                for (int j = 0; j <= i; j++) {
+                for (int j = 0; j < i; j++) {
                     c.moveToNext();
                 }
                 src = c.getString(c.getColumnIndex("THUMBNAIL"));
+                title = c.getString(c.getColumnIndex("TITLE"));
             }
             c.close();
-            Cursor d = MainActivity.database.rawQuery("SELECT TITLE FROM IMAGES", null);
-            if (d.moveToFirst()) {
-                for (int j = 0; j <= i; j++) {
-                    d.moveToNext();
-                }
-                title = d.getString(d.getColumnIndex("TITLE"));
-            }
-            d.close();
             FetchBitmap task = new FetchBitmap();
             task.execute(src);
             Bitmap image = task.get(1000, TimeUnit.MILLISECONDS);
@@ -76,10 +71,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         public void onClick(View v) {
             int itemPosition = MainActivity.recList.getChildPosition(v);
             Log.v(LOG_TAG, " " + String.valueOf(itemPosition));
-                Intent intent = new Intent(MainActivity.context, ImageActivity.class);
-                
-                MainActivity.context.startActivity(intent);
-
+            String src = "";
+            String title = "";
+            Intent intent = new Intent(MainActivity.context, ImageActivity.class);
+            intent.putExtra(MainActivity.EXTRA_MESSAGE, itemPosition);
+            MainActivity.context.startActivity(intent);
         }
     }
 

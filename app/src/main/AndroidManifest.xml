@@ -25,7 +25,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="jacob.com.whereami.ImageActivity"></activity>
+        <activity
+            android:name="jacob.com.whereami.ImageActivity"
+            android:screenOrientation="portrait"
+            android:parentActivityName="jacob.com.whereami.MainActivity">
+
+        </activity>
     </application>
 
 </manifest>

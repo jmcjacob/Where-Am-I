@@ -29,7 +29,7 @@ public class FetchImage extends AsyncTask<Void, Void, Boolean> {
         String thumbnail = null;
         String large = null;
         String original = null;
-        String update = null;
+        String update;
 
         JSONObject topobj = new JSONObject(JsonStr);
         JSONObject innerObj = topobj.getJSONObject("sizes");
@@ -46,10 +46,10 @@ public class FetchImage extends AsyncTask<Void, Void, Boolean> {
                 original = size.getString("source");
             }
         }
-        if (original!=null)
-            update = "UPDATE IMAGES SET THUMBNAIL = \"" + thumbnail + "\", SOURCE = \"" + original + "\" WHERE ID = \"" + ID + "\";";
-        else
+        if (large!=null)
             update = "UPDATE IMAGES SET THUMBNAIL = \"" + thumbnail + "\", SOURCE = \"" + large + "\" WHERE ID = \"" + ID + "\";";
+        else
+            update = "UPDATE IMAGES SET THUMBNAIL = \"" + thumbnail + "\", SOURCE = \"" + original + "\" WHERE ID = \"" + ID + "\";";
         MainActivity.database.execSQL(update);
         return null;
     }
@@ -63,7 +63,6 @@ public class FetchImage extends AsyncTask<Void, Void, Boolean> {
         Cursor c = MainActivity.database.rawQuery(query, null);
         c.moveToFirst();
         for (int i = 0; i < images; i ++) {
-            Log.v(LOG_TAG, String.valueOf(IDs));
             IDs[i] = c.getString(c.getColumnIndex("ID"));
             if(!c.moveToNext())
                 break;

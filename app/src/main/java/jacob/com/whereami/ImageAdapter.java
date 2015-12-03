@@ -70,9 +70,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         @Override
         public void onClick(View v) {
             int itemPosition = MainActivity.recList.getChildPosition(v);
-            Log.v(LOG_TAG, " " + String.valueOf(itemPosition));
-            String src = "";
-            String title = "";
             Intent intent = new Intent(MainActivity.context, ImageActivity.class);
             intent.putExtra(MainActivity.EXTRA_MESSAGE, itemPosition);
             MainActivity.context.startActivity(intent);

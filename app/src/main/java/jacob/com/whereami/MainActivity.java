@@ -74,21 +74,17 @@ public class MainActivity extends AppCompatActivity {
         swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                Log.v(LOG_TAG, "Refresh");
                 GridLayoutManager layout = (GridLayoutManager) recList.getLayoutManager();
                 layout.removeAllViews();
                 TextView textView = (TextView) findViewById(R.id.network);
                 textView.setVisibility(View.VISIBLE);
                 refreshItems();
             }
-
             void refreshItems() {
                 refresh();
                 onItemsComplete();
             }
-
             void onItemsComplete() {
-                Log.v(LOG_TAG, "Finished Refresh");
                 swipe.setRefreshing(false);
             }
         });

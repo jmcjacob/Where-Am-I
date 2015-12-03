@@ -50,7 +50,7 @@ public class ImageActivity extends AppCompatActivity {
         setTitle(title);
         ImageView imageView = (ImageView)findViewById(R.id.sourceImage);
         try {
-            image = task.get(1, TimeUnit.HOURS);
+            image = task.get(1000, TimeUnit.MILLISECONDS);
             imageView.setImageBitmap(image);
             }
         catch (Exception e) {

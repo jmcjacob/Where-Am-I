@@ -28,16 +28,17 @@
         <activity
             android:name="jacob.com.whereami.ImageActivity"
             android:parentActivityName="jacob.com.whereami.MainActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="jacob.com.whereami.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName="jacob.com.whereami.MainActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name="jacob.com.whereami.AboutActivity"
             android:label="@string/title_activity_about"
             android:parentActivityName="jacob.com.whereami.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="jacob.com.whereami.MainActivity" />
-        </activity>
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

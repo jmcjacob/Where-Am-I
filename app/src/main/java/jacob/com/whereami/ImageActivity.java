@@ -1,5 +1,6 @@
 package jacob.com.whereami;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -7,6 +8,7 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -16,6 +18,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.Key;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +34,8 @@ public class ImageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
         int itemPosition = intent.getIntExtra(MainActivity.EXTRA_MESSAGE, 1);
@@ -57,7 +62,6 @@ public class ImageActivity extends AppCompatActivity {
             Log.e(LOG_TAG, "FectchBitmap in ImageActivity: " + e);
 
         }
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -85,6 +89,9 @@ public class ImageActivity extends AppCompatActivity {
             toast = Toast.makeText(getApplicationContext(), "Saved " + title + ".jpg", Toast.LENGTH_SHORT);
             toast.show();
             return true;
+        }
+        if (id == 16908332) {
+            super.onBackPressed();
         }
         return false;
     }

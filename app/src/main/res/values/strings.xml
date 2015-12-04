@@ -6,6 +6,7 @@
     <string name="action_share">Share</string>
     <string name="action_save">Save</string>
     <string name="preference_file_key">jacob.com.whereiam.PREFERENCE</string>
+    <string name="google_api_key">AIzaSyCeqDvy4wCzfZf2TWuL8ERpw24C_L57nck</string>
 
     <string name="title_activity_drawer">Drawer</string>
     <string name="drawer_open">Open</string>

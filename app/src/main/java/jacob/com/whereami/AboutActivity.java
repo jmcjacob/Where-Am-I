@@ -1,8 +1,12 @@
 package jacob.com.whereami;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jacob.whereiam.R;
 
@@ -14,6 +18,7 @@ public class AboutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         try {
             if (MainActivity.isNetworkAvailable()) {
 
@@ -27,5 +32,13 @@ public class AboutActivity extends AppCompatActivity {
         catch (Exception e) {
 
         }
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == 16908332) {
+            super.onBackPressed();
+        }
+        return false;
     }
 }

@@ -1,5 +1,6 @@
 package jacob.com.whereami;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +14,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,22 +21,33 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.PlaceLikelihood;
+import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
 import com.jacob.whereiam.R;
 
 import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
     public final static String EXTRA_MESSAGE = "jacob.com.whereami.MESSAGE";
     public static Activity context;
     public static SharedPreferences sharedpreferences;
+    public static GoogleApiClient mGoogleApiClient;
     public static SQLiteDatabase database;
     public static RecyclerView recList;
     public static ImageAdapter image;
     public static SwipeRefreshLayout swipe;
-    public static Double lat = 53.230688;
-    public static Double lon = -0.540579;
+    public static Double lat = 0.0;
+    public static Double lon = 0.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +57,20 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        sharedpreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        mGoogleApiClient = new GoogleApiClient
+                .Builder( this )
+                .enableAutoManage( this, 0, this )
+                .addApi( Places.GEO_DATA_API )
+                .addApi( Places.PLACE_DETECTION_API )
+                .addConnectionCallbacks( this )
+                .addOnConnectionFailedListener( this )
+                .build();
 
+        guessCurrentPlace();
+
+        sharedpreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         database = openOrCreateDatabase("Image_Database", MODE_PRIVATE, null);
+
         recList = (RecyclerView) findViewById(R.id.card_view);
         recList.setHasFixedSize(true);
         GridLayoutManager glm = new GridLayoutManager(this, 2);
@@ -72,14 +94,28 @@ public class MainActivity extends AppCompatActivity {
                 textView.setText("Loading...");
                 refreshItems();
             }
+
             void refreshItems() {
                 refresh();
                 onItemsComplete();
             }
+
             void onItemsComplete() {
                 swipe.setRefreshing(false);
             }
         });
+    }
+
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    public void onConnected(Bundle b) {
+
+    }
+
+    public void onConnectionFailed(ConnectionResult result) {
+
     }
 
     @Override
@@ -109,6 +145,35 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
         return false;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if( mGoogleApiClient != null )
+            mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        if( mGoogleApiClient != null && mGoogleApiClient.isConnected() ) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onStop();
+    }
+
+    private void guessCurrentPlace() {
+        PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi.getCurrentPlace(mGoogleApiClient, null);
+        result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+            @Override
+            public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+                lat = likelyPlaces.get(0).getPlace().getLatLng().latitude;
+                lon = likelyPlaces.get(0).getPlace().getLatLng().longitude;
+                TextView text = (TextView)findViewById(R.id.locationName);
+                text.setText(likelyPlaces.get(0).getPlace().getName());
+                likelyPlaces.release();
+            }
+        });
     }
 
     private boolean refresh() {

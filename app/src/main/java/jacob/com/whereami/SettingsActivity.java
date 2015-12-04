@@ -1,9 +1,11 @@
 package jacob.com.whereami;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -19,11 +21,14 @@ public class SettingsActivity extends AppCompatActivity {
     private final String LOG_TAG = SettingsActivity.class.getSimpleName();
     EditText option1;
     EditText option2;
+    Boolean edited = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         option1 = (EditText) findViewById(R.id.load_images);
         option2 = (EditText) findViewById(R.id.cache);
         try {
@@ -33,16 +38,6 @@ public class SettingsActivity extends AppCompatActivity {
         catch (Exception e) {
             option1.setText("50");
             option2.setText("25");
-        }
-
-        if (MainActivity.isNetworkAvailable()) {
-            Chuck task = new Chuck();
-            task.execute();
-            TextView text = (TextView)findViewById(R.id.chuck);
-            try {
-                text.setText("Bonus Chuck Norris Fact:\n" + task.get(1000, TimeUnit.MILLISECONDS));
-            }
-            catch (Exception e) {}
         }
     }
 
@@ -57,6 +52,7 @@ public class SettingsActivity extends AppCompatActivity {
             editor.putInt("loadImage", loadImage);
             editor.putInt("cacheImage", cache);
             editor.commit();
+            edited = true;
             Toast toast = Toast.makeText(getApplicationContext(), "Saved Preferences", Toast.LENGTH_SHORT);
             toast.show();
         }
@@ -70,7 +66,21 @@ public class SettingsActivity extends AppCompatActivity {
         MainActivity.sharedpreferences.edit().clear().commit();
         option1.setText("50");
         option2.setText("25");
+        edited=true;
         Toast toast = Toast.makeText(getApplicationContext(), "Reset Preferences", Toast.LENGTH_SHORT);
         toast.show();
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == 16908332) {
+            if (edited)
+            {
+                Intent intent = new Intent(this, MainActivity.class);
+                this.startActivity(intent);
+            }
+            else
+                super.onBackPressed();
+        }
+        return false;
     }
 }

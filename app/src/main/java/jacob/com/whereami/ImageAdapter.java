@@ -38,6 +38,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         TextView textView = (TextView)MainActivity.context.findViewById(R.id.network);
         textView.setVisibility(View.INVISIBLE);
         textView.setText("");
+        TextView text = (TextView)MainActivity.context.findViewById(R.id.fact);
+        text.setVisibility(View.INVISIBLE);
         try {
             Cursor c = MainActivity.database.rawQuery("SELECT * FROM IMAGES", null);
             if (c.moveToFirst()) {

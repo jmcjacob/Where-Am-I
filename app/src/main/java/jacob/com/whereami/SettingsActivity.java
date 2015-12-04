@@ -40,7 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
             task.execute();
             TextView text = (TextView)findViewById(R.id.chuck);
             try {
-                text.setText("Bonus Chuck Norris Fact: " + task.get(1000, TimeUnit.MILLISECONDS));
+                text.setText("Bonus Chuck Norris Fact:\n" + task.get(1000, TimeUnit.MILLISECONDS));
             }
             catch (Exception e) {}
         }

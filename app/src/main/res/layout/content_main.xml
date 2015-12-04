@@ -21,6 +21,14 @@
         android:text="@string/loading"
         android:id="@+id/network"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/network"
+        android:gravity="center_horizontal"
+        android:id="@+id/fact"
+        android:visibility="visible"/>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

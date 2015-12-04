@@ -1,44 +1,26 @@
 package jacob.com.whereami;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.jacob.whereiam.R;
 
 import java.util.concurrent.TimeUnit;
@@ -64,11 +46,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-         sharedpreferences = getSharedPreferences(
-                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-
-        DrawerFragment drawer = (DrawerFragment) getSupportFragmentManager().findFragmentById(R.id.drawer_fragment);
-        drawer.setup(R.id.drawer_fragment, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
+        sharedpreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         database = openOrCreateDatabase("Image_Database", MODE_PRIVATE, null);
         recList = (RecyclerView) findViewById(R.id.card_view);
@@ -77,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
         glm.setOrientation(GridLayoutManager.VERTICAL);
         recList.setLayoutManager(glm);
         recList.setItemViewCacheSize(sharedpreferences.getInt("cacheImage", 25));
+
+        refresh();
+
+        DrawerFragment drawer = (DrawerFragment) getSupportFragmentManager().findFragmentById(R.id.drawer_fragment);
+        drawer.setup(R.id.drawer_fragment, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
 
         swipe = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
         swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -97,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
                 swipe.setRefreshing(false);
             }
         });
-        refresh();
     }
 
     @Override
@@ -131,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean refresh() {
         if (isNetworkAvailable()) {
+            setFact();
             database.execSQL("CREATE TABLE IF NOT EXISTS IMAGES(TITLE VARCHAR,ID VARCHAR, THUMBNAIL VARCHAR, SOURCE VARCHAR);");
             database.execSQL("DELETE FROM IMAGES;");
             FetchImages task = new FetchImages();
@@ -162,11 +145,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickRefresh(View view) {
+        GridLayoutManager layout = (GridLayoutManager) recList.getLayoutManager();
+        layout.removeAllViews();
         TextView textView = (TextView) findViewById(R.id.network);
         textView.setVisibility(View.VISIBLE);
         textView.setText("Loading...");
         Button butt = (Button)findViewById(R.id.refresh);
         butt.setVisibility(View.INVISIBLE);
         refresh();
+    }
+
+    public void setFact() {
+        RandomFact task = new RandomFact();
+        task.execute();
+        TextView textView = (TextView)findViewById(R.id.fact);
+        textView.setVisibility(View.VISIBLE);
+        try {
+            textView.setText("Random Fact:\n" + task.get(1000, TimeUnit.MILLISECONDS));
+        }
+        catch (Exception e) {
+            Log.e(LOG_TAG, "setFact " + e);
+        }
     }
 }

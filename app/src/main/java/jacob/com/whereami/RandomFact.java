@@ -10,17 +10,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class Chuck extends AsyncTask<Void, Void, String> {
+public class RandomFact extends AsyncTask<Void, Void, String> {
 
     private final String LOG_TAG = CatFact.class.getSimpleName();
-
-    private String getImageDataFromJson(String JsonStr) throws Exception {
-
-        JSONObject topobj = new JSONObject(JsonStr);
-        JSONObject inobj = topobj.getJSONObject("value");
-        String joke = inobj.getString("joke");
-        return joke.replace("&quot;", "\"");
-    }
 
     protected String doInBackground(Void... v){
         HttpURLConnection urlConnection = null;
@@ -28,7 +20,7 @@ public class Chuck extends AsyncTask<Void, Void, String> {
         String imageJsonStr = null;
 
         try {
-            final String CAT_BASE_URL = "http://api.icndb.com/jokes/random";
+            final String CAT_BASE_URL = "http://numbersapi.com/random/trivia";
 
             URL url = new URL(CAT_BASE_URL);
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -68,7 +60,7 @@ public class Chuck extends AsyncTask<Void, Void, String> {
             }
         }
         try {
-            return getImageDataFromJson(imageJsonStr);
+            return imageJsonStr;
         }
         catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage(), e);
@@ -77,4 +69,3 @@ public class Chuck extends AsyncTask<Void, Void, String> {
         return null;
     }
 }
-

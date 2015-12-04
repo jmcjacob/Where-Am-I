@@ -21,13 +21,15 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Images to load: "
+                android:text="Images to load (1-100): "
                 android:padding="15dp"
                 android:id="@+id/option1"/>
 
             <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:id="@+id/load_images" />
 
         </LinearLayout>
 
@@ -43,8 +45,10 @@
                 android:id="@+id/option2"/>
 
             <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="42dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:id="@+id/cache"/>
 
         </LinearLayout>
 
@@ -52,7 +56,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Save"
-            android:padding="15dp"/>
+            android:padding="15dp"
+            android:onClick="onClickSave" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reset"
+            android:padding="15dp"
+            android:onClick="onClickReset"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            android:gravity="center_horizontal"
+            android:id="@+id/chuck"/>
 
     </LinearLayout>
 

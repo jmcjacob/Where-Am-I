@@ -21,6 +21,17 @@
         android:text="@string/loading"
         android:id="@+id/network"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Refresh"
+        android:padding="15dp"
+        android:onClick="onClickRefresh"
+        android:layout_below="@+id/network"
+        android:id="@+id/refresh"
+        android:visibility="gone"
+        android:layout_centerHorizontal="true"/>
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"

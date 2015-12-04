@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,8 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private final String LOG_TAG = MainActivity.class.getSimpleName();
     public final static String EXTRA_MESSAGE = "jacob.com.whereami.MESSAGE";
     public static Activity context;
-    public static RecyclerView recList;
+    public static SharedPreferences sharedpreferences;
     public static SQLiteDatabase database;
+    public static RecyclerView recList;
     public static ImageAdapter image;
     public static SwipeRefreshLayout swipe;
     public static Double lat = 53.230688;
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        SharedPreferences sharedPref = context.getSharedPreferences(
+         sharedpreferences = getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         DrawerFragment drawer = (DrawerFragment) getSupportFragmentManager().findFragmentById(R.id.drawer_fragment);
@@ -74,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         GridLayoutManager glm = new GridLayoutManager(this, 2);
         glm.setOrientation(GridLayoutManager.VERTICAL);
         recList.setLayoutManager(glm);
-        recList.setItemViewCacheSize(25);
+        recList.setItemViewCacheSize(sharedpreferences.getInt("cacheImage", 25));
 
         swipe = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
         swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -84,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 layout.removeAllViews();
                 TextView textView = (TextView) findViewById(R.id.network);
                 textView.setVisibility(View.VISIBLE);
+                textView.setText("Loading...");
                 refreshItems();
             }
             void refreshItems() {
@@ -105,16 +108,23 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        TextView text = (TextView)findViewById(R.id.network);
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
-            return true;
+            if (text.getText() == "" || text.getText() == "No Network Connection") {
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            return false;
         }
         if (id == R.id.action_about) {
-            Intent intent = new Intent(this, AboutActivity.class);
-            startActivity(intent);
-            return true;
+            if (text.getText() == "" || text.getText() == "No Network Connection") {
+                Intent intent = new Intent(this, AboutActivity.class);
+                startActivity(intent);
+                return true;
+            }
+            return false;
         }
         return false;
     }
@@ -124,13 +134,17 @@ public class MainActivity extends AppCompatActivity {
             database.execSQL("CREATE TABLE IF NOT EXISTS IMAGES(TITLE VARCHAR,ID VARCHAR, THUMBNAIL VARCHAR, SOURCE VARCHAR);");
             database.execSQL("DELETE FROM IMAGES;");
             FetchImages task = new FetchImages();
-            task.images = 50;
+            task.images = sharedpreferences.getInt("loadImage",50);
             task.execute(String.valueOf(lat), String.valueOf(lon));
             return true;
         }
         else {
             TextView textView = (TextView)findViewById(R.id.network);
             textView.setText("No Network Connection");
+            Button butt = (Button)findViewById(R.id.refresh);
+            butt.setVisibility(View.VISIBLE);
+            Toast toast = Toast.makeText(getApplicationContext(), "Could Not Connect to Network", Toast.LENGTH_SHORT);
+            toast.show();
             return false;
         }
     }
@@ -147,4 +161,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void onClickRefresh(View view) {
+        TextView textView = (TextView) findViewById(R.id.network);
+        textView.setVisibility(View.VISIBLE);
+        textView.setText("Loading...");
+        Button butt = (Button)findViewById(R.id.refresh);
+        butt.setVisibility(View.INVISIBLE);
+        refresh();
+    }
 }

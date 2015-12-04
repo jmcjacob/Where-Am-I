@@ -16,10 +16,11 @@ public class AboutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_about);
         try {
             if (MainActivity.isNetworkAvailable()) {
+
                 CatFact task = new CatFact();
                 task.execute();
                 TextView text = (TextView) findViewById(R.id.plea);
-                String plea = text.getText() + " And now for your amusement here is a cat Fact. " + task.get(1000, TimeUnit.MILLISECONDS);
+                String plea = text.getText() + " And now for your amusement here is a cat fact. " + task.get(1000, TimeUnit.MILLISECONDS);
                 text.setText(plea);
             }
         }

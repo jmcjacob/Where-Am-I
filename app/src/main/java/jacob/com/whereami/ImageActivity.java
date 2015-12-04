@@ -79,7 +79,7 @@ public class ImageActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_save) {
-            Toast toast = Toast.makeText(getApplicationContext(), "Saving "+title, Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getApplicationContext(), "Saving "+title + ".jpg", Toast.LENGTH_SHORT);
             toast.show();
             storeImage(image);
             toast = Toast.makeText(getApplicationContext(), "Saved " + title + ".jpg", Toast.LENGTH_SHORT);

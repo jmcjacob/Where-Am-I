@@ -37,6 +37,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         String title = "Failed";
         TextView textView = (TextView)MainActivity.context.findViewById(R.id.network);
         textView.setVisibility(View.INVISIBLE);
+        textView.setText("");
         try {
             Cursor c = MainActivity.database.rawQuery("SELECT * FROM IMAGES", null);
             if (c.moveToFirst()) {

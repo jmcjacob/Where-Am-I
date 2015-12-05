@@ -47,7 +47,6 @@ public class SettingsActivity extends AppCompatActivity {
         EditText option2 = (EditText) findViewById(R.id.cache);
         int cache = Integer.valueOf(option2.getText().toString());
         if (101>loadImage && 0<loadImage && 0<cache) {
-
             SharedPreferences.Editor editor = MainActivity.sharedpreferences.edit();
             editor.putInt("loadImage", loadImage);
             editor.putInt("cacheImage", cache);

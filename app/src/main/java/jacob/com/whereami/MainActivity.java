@@ -41,6 +41,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.jacob.whereiam.R;
 
+import org.w3c.dom.Text;
+
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
@@ -54,8 +56,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public static RecyclerView recList;
     public static ImageAdapter image;
     public static SwipeRefreshLayout swipe;
-    public static Double lat;
-    public static Double lon;
+    public static Double lat = 0.0;
+    public static Double lon = 0.0;
+    public static Boolean places;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +71,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 .addOnConnectionFailedListener( this )
                 .build();
 
-        guessCurrentPlace();
+        places = false;
+
+        if (!places)
+            guessCurrentPlace();
 
         context = this;
         super.onCreate(savedInstanceState);
@@ -78,6 +84,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         sharedpreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         database = openOrCreateDatabase("Image_Database", MODE_PRIVATE, null);
+
+        TextView textView = (TextView)findViewById(R.id.locationName);
+        lat = Double.longBitsToDouble(sharedpreferences.getLong("latestLat", Double.doubleToLongBits(0.0)));
+        lon = Double.longBitsToDouble(sharedpreferences.getLong("latestLon", Double.doubleToLongBits(0.0)));
+        textView.setText(sharedpreferences.getString("latestLoc", "Location"));
 
         recList = (RecyclerView) findViewById(R.id.card_view);
         recList.setHasFixedSize(true);
@@ -121,6 +132,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 return false;
             }
         });
+
+        refresh();
     }
 
     public void onConnectionSuspended(int i) {
@@ -191,6 +204,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     TextView text = (TextView) findViewById(R.id.locationName);
                     text.setText(likelyPlaces.get(0).getPlace().getName());
                     likelyPlaces.release();
+                    SharedPreferences.Editor editor = sharedpreferences.edit();
+                    editor.putLong("latestLat", Double.doubleToRawLongBits(lat));
+                    editor.putLong("latestLon", Double.doubleToRawLongBits(lon));
+                    editor.putString("latestLoc", (String) text.getText());
+                    editor.commit();
                 }
             });
         }
@@ -200,8 +218,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private boolean refresh() {
-        if (isNetworkAvailable() && isLocationEnabled(this)) {
-            guessCurrentPlace();
+        if (isNetworkAvailable()) {
+            if (!places)
+                guessCurrentPlace();
             setFact();
             database.execSQL("CREATE TABLE IF NOT EXISTS IMAGES(TITLE VARCHAR,ID VARCHAR, THUMBNAIL VARCHAR, SOURCE VARCHAR);");
             database.execSQL("DELETE FROM IMAGES;");
@@ -210,30 +229,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             task.execute(String.valueOf(lat), String.valueOf(lon));
             return true;
         }
-        else if(isNetworkAvailable()){
-            TextView textView = (TextView)findViewById(R.id.network);
-            textView.setText("Could Not Find Location");
-            Button butt = (Button)findViewById(R.id.refresh);
-            butt.setVisibility(View.VISIBLE);
-            Toast toast = Toast.makeText(getApplicationContext(), "Could Not Find Location", Toast.LENGTH_SHORT);
-            toast.show();
-            return false;
-        }
-        else if(isLocationEnabled(this)) {
-            TextView textView = (TextView)findViewById(R.id.network);
-            textView.setText("No Network Connection");
-            Button butt = (Button)findViewById(R.id.refresh);
+        else {
+            TextView textView = (TextView) findViewById(R.id.network);
+            textView.setText("Couldn't connect to network");
+            Button butt = (Button) findViewById(R.id.refresh);
             butt.setVisibility(View.VISIBLE);
             Toast toast = Toast.makeText(getApplicationContext(), "Could Not Connect to Network", Toast.LENGTH_SHORT);
-            toast.show();
-            return false;
-        }
-        else {
-            TextView textView = (TextView)findViewById(R.id.network);
-            textView.setText("No Network and Location");
-            Button butt = (Button)findViewById(R.id.refresh);
-            butt.setVisibility(View.VISIBLE);
-            Toast toast = Toast.makeText(getApplicationContext(), "Could Not Connect to Network or Location", Toast.LENGTH_SHORT);
             toast.show();
             return false;
         }
@@ -305,6 +306,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
         catch (Exception e) {
             Log.e(LOG_TAG, "onPlacesClick: " + e);
+        }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(data, this);
+                lat = place.getLatLng().latitude;
+                lon = place.getLatLng().longitude;
+                TextView text = (TextView) findViewById(R.id.locationName);
+                text.setText(place.getName());
+                places = true;
+                GridLayoutManager layout = (GridLayoutManager) recList.getLayoutManager();
+                layout.removeAllViews();
+                TextView textView = (TextView) findViewById(R.id.network);
+                textView.setVisibility(View.VISIBLE);
+                textView.setText("Loading...");
+                refresh();
+            }
         }
     }
 }

@@ -8,13 +8,17 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,10 +30,14 @@ import android.support.v7.widget.Toolbar;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.jacob.whereiam.R;
 
@@ -46,17 +54,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public static RecyclerView recList;
     public static ImageAdapter image;
     public static SwipeRefreshLayout swipe;
-    public static Double lat = 0.0;
-    public static Double lon = 0.0;
+    public static Double lat;
+    public static Double lon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        context = this;
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         mGoogleApiClient = new GoogleApiClient
                 .Builder( this )
                 .enableAutoManage( this, 0, this )
@@ -68,6 +70,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         guessCurrentPlace();
 
+        context = this;
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         sharedpreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         database = openOrCreateDatabase("Image_Database", MODE_PRIVATE, null);
 
@@ -77,8 +85,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         glm.setOrientation(GridLayoutManager.VERTICAL);
         recList.setLayoutManager(glm);
         recList.setItemViewCacheSize(sharedpreferences.getInt("cacheImage", 25));
-
-        refresh();
 
         DrawerFragment drawer = (DrawerFragment) getSupportFragmentManager().findFragmentById(R.id.drawer_fragment);
         drawer.setup(R.id.drawer_fragment, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
@@ -102,6 +108,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
             void onItemsComplete() {
                 swipe.setRefreshing(false);
+            }
+        });
+
+        TextView text = (TextView)findViewById(R.id.locationName);
+        text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == TextView.VISIBLE) {
+                    refresh();
+                }
+                return false;
             }
         });
     }
@@ -163,21 +180,28 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void guessCurrentPlace() {
-        PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi.getCurrentPlace(mGoogleApiClient, null);
-        result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
-            @Override
-            public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
-                lat = likelyPlaces.get(0).getPlace().getLatLng().latitude;
-                lon = likelyPlaces.get(0).getPlace().getLatLng().longitude;
-                TextView text = (TextView)findViewById(R.id.locationName);
-                text.setText(likelyPlaces.get(0).getPlace().getName());
-                likelyPlaces.release();
-            }
-        });
+        try {
+            mGoogleApiClient.connect();
+            PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi.getCurrentPlace(mGoogleApiClient, null);
+            result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+                @Override
+                public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+                    lat = likelyPlaces.get(0).getPlace().getLatLng().latitude;
+                    lon = likelyPlaces.get(0).getPlace().getLatLng().longitude;
+                    TextView text = (TextView) findViewById(R.id.locationName);
+                    text.setText(likelyPlaces.get(0).getPlace().getName());
+                    likelyPlaces.release();
+                }
+            });
+        }
+        catch (Exception e) {
+            Log.e(LOG_TAG, "guessCurrentPlace: " + e);
+        }
     }
 
     private boolean refresh() {
-        if (isNetworkAvailable()) {
+        if (isNetworkAvailable() && isLocationEnabled(this)) {
+            guessCurrentPlace();
             setFact();
             database.execSQL("CREATE TABLE IF NOT EXISTS IMAGES(TITLE VARCHAR,ID VARCHAR, THUMBNAIL VARCHAR, SOURCE VARCHAR);");
             database.execSQL("DELETE FROM IMAGES;");
@@ -186,12 +210,30 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             task.execute(String.valueOf(lat), String.valueOf(lon));
             return true;
         }
-        else {
+        else if(isNetworkAvailable()){
+            TextView textView = (TextView)findViewById(R.id.network);
+            textView.setText("Could Not Find Location");
+            Button butt = (Button)findViewById(R.id.refresh);
+            butt.setVisibility(View.VISIBLE);
+            Toast toast = Toast.makeText(getApplicationContext(), "Could Not Find Location", Toast.LENGTH_SHORT);
+            toast.show();
+            return false;
+        }
+        else if(isLocationEnabled(this)) {
             TextView textView = (TextView)findViewById(R.id.network);
             textView.setText("No Network Connection");
             Button butt = (Button)findViewById(R.id.refresh);
             butt.setVisibility(View.VISIBLE);
             Toast toast = Toast.makeText(getApplicationContext(), "Could Not Connect to Network", Toast.LENGTH_SHORT);
+            toast.show();
+            return false;
+        }
+        else {
+            TextView textView = (TextView)findViewById(R.id.network);
+            textView.setText("No Network and Location");
+            Button butt = (Button)findViewById(R.id.refresh);
+            butt.setVisibility(View.VISIBLE);
+            Toast toast = Toast.makeText(getApplicationContext(), "Could Not Connect to Network or Location", Toast.LENGTH_SHORT);
             toast.show();
             return false;
         }
@@ -205,6 +247,28 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
         catch (Exception e) {
             Log.e("", "isNetworkAvailable: " + e);
+            return false;
+        }
+    }
+
+    public static boolean isLocationEnabled(Context context) {
+        try {
+            int locationMode = 0;
+            String locationProviders;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                try {
+                    locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
+                } catch (Settings.SettingNotFoundException e) {
+                    e.printStackTrace();
+                }
+                return locationMode != Settings.Secure.LOCATION_MODE_OFF;
+            } else {
+                locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+                return !TextUtils.isEmpty(locationProviders);
+            }
+        }
+        catch (Exception e) {
+            Log.e("", "isLocationEnabled: " + e);
             return false;
         }
     }
@@ -230,6 +294,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
         catch (Exception e) {
             Log.e(LOG_TAG, "setFact " + e);
+        }
+    }
+
+    public void onPlacesClick(View view) {
+        int PLACE_PICKER_REQUEST = 1;
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        try {
+            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+        }
+        catch (Exception e) {
+            Log.e(LOG_TAG, "onPlacesClick: " + e);
         }
     }
 }

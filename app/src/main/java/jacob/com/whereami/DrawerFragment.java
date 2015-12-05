@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.Toolbar;
 
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.jacob.whereiam.R;
 
 public class DrawerFragment extends Fragment{

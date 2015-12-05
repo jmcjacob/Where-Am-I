@@ -51,7 +51,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/card_view"
-            android:layout_below="@+id/locationText"/>
+            android:layout_below="@+id/locationText"
+            android:scrollbars="vertical"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

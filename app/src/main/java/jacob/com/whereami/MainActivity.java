@@ -362,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void onClickNumber(View view) {
         TextView textView = (TextView)findViewById(R.id.number);
-        if (textView.getText().equals("")) {
+        if (!textView.getText().equals("")) {
             Intent intent = new Intent(Intent.ACTION_DIAL);
             intent.setData(Uri.parse("tel:" + textView.getText()));
             startActivity(intent);
@@ -371,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void onClickWeb(View view) {
         TextView textView = (TextView)findViewById(R.id.webAddress);
-        if (textView.getText().equals("")) {
+        if (!textView.getText().equals("")) {
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse((String) textView.getText()));
             startActivity(i);

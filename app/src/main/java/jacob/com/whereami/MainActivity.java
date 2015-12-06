@@ -1,6 +1,5 @@
 package jacob.com.whereami;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -27,25 +26,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
-
-import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
 import com.jacob.whereiam.R;
-
-import org.w3c.dom.Text;
-
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
@@ -65,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
                 .enableAutoManage(this, 0, this)
@@ -76,9 +64,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 .addOnConnectionFailedListener(this)
                 .addApi(AppIndex.API).build();
         places = false;
-
-        if (!places)
-            guessCurrentPlace();
 
         context = this;
         super.onCreate(savedInstanceState);
@@ -148,29 +133,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        TextView text = (TextView)findViewById(R.id.network);
+            getMenuInflater().inflate(R.menu.menu_main, menu);
+            return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        TextView text = (TextView)findViewById(R.id.network);
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            if (text.getText() == "" || text.getText() == "No Network Connection") {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
-            }
-            return false;
         }
         if (id == R.id.action_about) {
-            if (text.getText() == "" || text.getText() == "No Network Connection") {
                 Intent intent = new Intent(this, AboutActivity.class);
                 startActivity(intent);
-                return true;
-            }
-            return false;
         }
         return false;
     }
@@ -180,19 +158,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onStart();
         if (mGoogleApiClient != null)
             mGoogleApiClient.connect();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Main Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app deep link URI is correct.
-                Uri.parse("android-app://jacob.com.whereami/http/host/path")
-        );
-        AppIndex.AppIndexApi.start(mGoogleApiClient, viewAction);
     }
 
     @Override
@@ -201,57 +166,43 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             mGoogleApiClient.disconnect();
         }
         super.onStop();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Main Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app deep link URI is correct.
-                Uri.parse("android-app://jacob.com.whereami/http/host/path")
-        );
-        AppIndex.AppIndexApi.end(mGoogleApiClient, viewAction);
     }
 
     private void guessCurrentPlace() {
         try {
-            mGoogleApiClient.connect();
-            PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi.getCurrentPlace(mGoogleApiClient, null);
-            result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
-                @Override
-                public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
-                    lat = likelyPlaces.get(0).getPlace().getLatLng().latitude;
-                    lon = likelyPlaces.get(0).getPlace().getLatLng().longitude;
-                    TextView text = (TextView) findViewById(R.id.locationName);
-                    text.setText(likelyPlaces.get(0).getPlace().getName());
-                    text = (TextView) findViewById(R.id.address);
-                    if (!likelyPlaces.get(0).getPlace().getAddress().toString().equals(null)) {
-                        String address = (String) likelyPlaces.get(0).getPlace().getAddress();
-                        text.setText(address.replace(", ", ",\n"));
+                mGoogleApiClient.connect();
+                PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi.getCurrentPlace(mGoogleApiClient, null);
+                result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+                    @Override
+                    public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+                        lat = likelyPlaces.get(0).getPlace().getLatLng().latitude;
+                        lon = likelyPlaces.get(0).getPlace().getLatLng().longitude;
+                        TextView text = (TextView) findViewById(R.id.locationName);
+                        text.setText(likelyPlaces.get(0).getPlace().getName());
+                        text = (TextView) findViewById(R.id.address);
+                        if (!likelyPlaces.get(0).getPlace().getAddress().toString().equals(null)) {
+                            String address = (String) likelyPlaces.get(0).getPlace().getAddress();
+                            text.setText(address.replace(", ", ",\n"));
+                        }
+                        text = (TextView) findViewById(R.id.number);
+                        if (!likelyPlaces.get(0).getPlace().getPhoneNumber().toString().equals(null)) {
+                            String number = (String) likelyPlaces.get(0).getPlace().getPhoneNumber();
+                            text.setText(number.replace(" ", ""));
+                        }
+                        text = (TextView) findViewById(R.id.webAddress);
+                        if (likelyPlaces.get(0).getPlace().getWebsiteUri() == null) {
+                            TextView textView = (TextView) findViewById(R.id.webAddress);
+                            textView.setText("");
+                        } else
+                            text.setText(likelyPlaces.get(0).getPlace().getWebsiteUri().toString());
+                        likelyPlaces.release();
+                        SharedPreferences.Editor editor = sharedpreferences.edit();
+                        editor.putLong("latestLat", Double.doubleToRawLongBits(lat));
+                        editor.putLong("latestLon", Double.doubleToRawLongBits(lon));
+                        editor.putString("latestLoc", (String) text.getText());
+                        editor.commit();
                     }
-                    text = (TextView) findViewById(R.id.number);
-                    if (!likelyPlaces.get(0).getPlace().getPhoneNumber().toString().equals(null)) {
-                        String number = (String)likelyPlaces.get(0).getPlace().getPhoneNumber();
-                        text.setText(number.replace(" ", ""));
-                    }
-                    text = (TextView) findViewById(R.id.webAddress);
-                    if (likelyPlaces.get(0).getPlace().getWebsiteUri() == null) {
-                        TextView textView = (TextView) findViewById(R.id.webAddress);
-                        textView.setText("");
-                    }
-                    else
-                        text.setText(likelyPlaces.get(0).getPlace().getWebsiteUri().toString());
-                    likelyPlaces.release();
-                    SharedPreferences.Editor editor = sharedpreferences.edit();
-                    editor.putLong("latestLat", Double.doubleToRawLongBits(lat));
-                    editor.putLong("latestLon", Double.doubleToRawLongBits(lon));
-                    editor.putString("latestLoc", (String) text.getText());
-                    editor.commit();
-                }
-            });
+                });
         }
         catch (Exception e) {
             Log.e(LOG_TAG, "guessCurrentPlace: " + e);
@@ -333,12 +284,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void onPlacesClick(View view) {
         if (!places) {
-            int PLACE_PICKER_REQUEST = 1;
-            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-            try {
-                startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
-            } catch (Exception e) {
-                Log.e(LOG_TAG, "onPlacesClick: " + e);
+            if (isNetworkAvailable()) {
+                int PLACE_PICKER_REQUEST = 1;
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                try {
+                    startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, "onPlacesClick: " + e);
+                }
+            }
+            else {
+                Toast toast = Toast.makeText(getApplicationContext(), "Could Not Connect to Network", Toast.LENGTH_SHORT);
+                toast.show();
             }
         }
         else {
@@ -405,15 +362,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void onClickNumber(View view) {
         TextView textView = (TextView)findViewById(R.id.number);
-        Intent intent = new Intent(Intent.ACTION_DIAL);
-        intent.setData(Uri.parse("tel:" + textView.getText()));
-        startActivity(intent);
+        if (textView.getText().equals("")) {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:" + textView.getText()));
+            startActivity(intent);
+        }
     }
 
     public void onClickWeb(View view) {
         TextView textView = (TextView)findViewById(R.id.webAddress);
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse((String)textView.getText()));
-        startActivity(i);
+        if (textView.getText().equals("")) {
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse((String) textView.getText()));
+            startActivity(i);
+        }
     }
 }

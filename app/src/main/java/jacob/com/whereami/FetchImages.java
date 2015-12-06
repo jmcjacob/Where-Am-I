@@ -27,8 +27,12 @@ public class FetchImages extends AsyncTask<String, Integer, Void> {
         JSONObject innerObj = topobj.getJSONObject("photos");
         JSONArray jsonArray = innerObj.getJSONArray("photo");
 
+        Integer search = jsonArray.length();
+        if (images <= jsonArray.length())
+            search = images;
+
         try {
-            for (int i = 0; i < images; i++) {
+            for (int i = 0; i < search; i++) {
                 JSONObject photo = jsonArray.getJSONObject(i);
                 String[] temp = {photo.getString("title"), photo.getString("id")};
                 MainActivity.database.execSQL("INSERT INTO IMAGES (TITLE, ID) VALUES (\"" + temp[0] + "\",\"" + temp[1] + "\");");

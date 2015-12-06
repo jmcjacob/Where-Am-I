@@ -5,6 +5,7 @@ import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +39,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         TextView textView = (TextView)MainActivity.context.findViewById(R.id.network);
         textView.setVisibility(View.INVISIBLE);
         textView.setText("");
+        SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout)MainActivity.context.findViewById(R.id.swipeRefresh);
+        refreshLayout.setRefreshing(false);
         TextView text = (TextView)MainActivity.context.findViewById(R.id.fact);
         text.setVisibility(View.INVISIBLE);
         try {

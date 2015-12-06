@@ -9,35 +9,70 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="120dp"
         android:background="@color/colorPrimaryDark"
         android:orientation="horizontal"
         android:id="@+id/navigation_header_container">
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/header"/>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="60dp"
-            android:paddingBottom="60dp"
-            android:paddingLeft="10dp"
-            android:background="@color/colorPrimary"
+            android:paddingTop="50dp"
             android:textSize="25sp"
-            android:textColor="@color/white"
-            android:id="@+id/locationName" />
+            android:id="@+id/locationName"
+            android:paddingLeft="10dp"
+            android:textColor="#000000"/>
 
     </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/navigation_header_container">
+        android:layout_below="@+id/navigation_header_container"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/address"
+            android:textSize="20sp"
+            android:paddingLeft="10dp"
+            android:paddingTop="15dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/number"
+            android:textSize="20sp"
+            android:paddingLeft="10dp"
+            android:paddingTop="15dp"
+            android:onClick="onClickNumber"
+            android:textColor="#2200CC"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/webAddress"
+            android:textSize="20sp"
+            android:paddingLeft="10dp"
+            android:paddingTop="15dp"
+            android:onClick="onClickWeb"
+            android:textColor="#2200CC"/>
 
         <Button
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="30dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/placesButton"
             android:onClick="onPlacesClick"
-            android:text="Find Location"/>
+            android:text="Find Location" />
 
     </LinearLayout>
 

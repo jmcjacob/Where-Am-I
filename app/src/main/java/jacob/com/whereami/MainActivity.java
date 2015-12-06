@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -27,6 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -62,15 +65,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
         mGoogleApiClient = new GoogleApiClient
-                .Builder( this )
-                .enableAutoManage( this, 0, this )
-                .addApi( Places.GEO_DATA_API )
-                .addApi( Places.PLACE_DETECTION_API )
-                .addConnectionCallbacks( this )
-                .addOnConnectionFailedListener( this )
-                .build();
-
+                .Builder(this)
+                .enableAutoManage(this, 0, this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(AppIndex.API).build();
         places = false;
 
         if (!places)
@@ -85,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         sharedpreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         database = openOrCreateDatabase("Image_Database", MODE_PRIVATE, null);
 
-        TextView textView = (TextView)findViewById(R.id.locationName);
+        TextView textView = (TextView) findViewById(R.id.locationName);
         lat = Double.longBitsToDouble(sharedpreferences.getLong("latestLat", Double.doubleToLongBits(0.0)));
         lon = Double.longBitsToDouble(sharedpreferences.getLong("latestLon", Double.doubleToLongBits(0.0)));
         textView.setText(sharedpreferences.getString("latestLoc", "Location"));
@@ -106,23 +110,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onRefresh() {
                 GridLayoutManager layout = (GridLayoutManager) recList.getLayoutManager();
                 layout.removeAllViews();
-                TextView textView = (TextView) findViewById(R.id.network);
-                textView.setVisibility(View.VISIBLE);
-                textView.setText("Loading...");
+                Button butt = (Button) findViewById(R.id.refresh);
+                butt.setVisibility(View.INVISIBLE);
                 refreshItems();
             }
 
             void refreshItems() {
                 refresh();
-                onItemsComplete();
-            }
-
-            void onItemsComplete() {
-                swipe.setRefreshing(false);
             }
         });
 
-        TextView text = (TextView)findViewById(R.id.locationName);
+        TextView text = (TextView) findViewById(R.id.locationName);
         text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -180,16 +178,42 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onStart() {
         super.onStart();
-        if( mGoogleApiClient != null )
+        if (mGoogleApiClient != null)
             mGoogleApiClient.connect();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://jacob.com.whereami/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(mGoogleApiClient, viewAction);
     }
 
     @Override
     protected void onStop() {
-        if( mGoogleApiClient != null && mGoogleApiClient.isConnected() ) {
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
         super.onStop();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://jacob.com.whereami/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(mGoogleApiClient, viewAction);
     }
 
     private void guessCurrentPlace() {
@@ -203,6 +227,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     lon = likelyPlaces.get(0).getPlace().getLatLng().longitude;
                     TextView text = (TextView) findViewById(R.id.locationName);
                     text.setText(likelyPlaces.get(0).getPlace().getName());
+                    text = (TextView) findViewById(R.id.address);
+                    if (!likelyPlaces.get(0).getPlace().getAddress().toString().equals(null)) {
+                        String address = (String) likelyPlaces.get(0).getPlace().getAddress();
+                        text.setText(address.replace(", ", ",\n"));
+                    }
+                    text = (TextView) findViewById(R.id.number);
+                    if (!likelyPlaces.get(0).getPlace().getPhoneNumber().toString().equals(null)) {
+                        String number = (String)likelyPlaces.get(0).getPlace().getPhoneNumber();
+                        text.setText(number.replace(" ", ""));
+                    }
+                    text = (TextView) findViewById(R.id.webAddress);
+                    if (likelyPlaces.get(0).getPlace().getWebsiteUri() == null) {
+                        TextView textView = (TextView) findViewById(R.id.webAddress);
+                        textView.setText("");
+                    }
+                    else
+                        text.setText(likelyPlaces.get(0).getPlace().getWebsiteUri().toString());
                     likelyPlaces.release();
                     SharedPreferences.Editor editor = sharedpreferences.edit();
                     editor.putLong("latestLat", Double.doubleToRawLongBits(lat));
@@ -220,7 +261,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private boolean refresh() {
         if (isNetworkAvailable()) {
             if (!places)
-                guessCurrentPlace();
+                if (isLocationEnabled(this))
+                    guessCurrentPlace();
             setFact();
             database.execSQL("CREATE TABLE IF NOT EXISTS IMAGES(TITLE VARCHAR,ID VARCHAR, THUMBNAIL VARCHAR, SOURCE VARCHAR);");
             database.execSQL("DELETE FROM IMAGES;");
@@ -230,6 +272,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             return true;
         }
         else {
+            GridLayoutManager layout = (GridLayoutManager) recList.getLayoutManager();
+            layout.removeAllViews();
             TextView textView = (TextView) findViewById(R.id.network);
             textView.setText("Couldn't connect to network");
             Button butt = (Button) findViewById(R.id.refresh);
@@ -274,17 +318,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-    public void onClickRefresh(View view) {
-        GridLayoutManager layout = (GridLayoutManager) recList.getLayoutManager();
-        layout.removeAllViews();
-        TextView textView = (TextView) findViewById(R.id.network);
-        textView.setVisibility(View.VISIBLE);
-        textView.setText("Loading...");
-        Button butt = (Button)findViewById(R.id.refresh);
-        butt.setVisibility(View.INVISIBLE);
-        refresh();
-    }
-
     public void setFact() {
         RandomFact task = new RandomFact();
         task.execute();
@@ -299,17 +332,40 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void onPlacesClick(View view) {
-        int PLACE_PICKER_REQUEST = 1;
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-        try {
-            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+        if (!places) {
+            int PLACE_PICKER_REQUEST = 1;
+            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+            try {
+                startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "onPlacesClick: " + e);
+            }
         }
-        catch (Exception e) {
-            Log.e(LOG_TAG, "onPlacesClick: " + e);
+        else {
+            places = false;
+            GridLayoutManager layout = (GridLayoutManager) recList.getLayoutManager();
+            layout.removeAllViews();
+            TextView textView = (TextView) findViewById(R.id.network);
+            textView.setVisibility(View.VISIBLE);
+            textView.setText("Loading...");
+            refresh();
+            Button butt = (Button) findViewById(R.id.placesButton);
+            butt.setText("Find Location");
         }
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onClickRefresh(View view) {
+        GridLayoutManager layout = (GridLayoutManager) recList.getLayoutManager();
+        layout.removeAllViews();
+        TextView textView = (TextView) findViewById(R.id.network);
+        textView.setVisibility(View.VISIBLE);
+        textView.setText("Loading...");
+        Button butt = (Button)findViewById(R.id.refresh);
+        butt.setVisibility(View.INVISIBLE);
+        refresh();
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) throws NullPointerException{
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, this);
@@ -317,6 +373,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 lon = place.getLatLng().longitude;
                 TextView text = (TextView) findViewById(R.id.locationName);
                 text.setText(place.getName());
+                text = (TextView) findViewById(R.id.address);
+                if (!place.getAddress().toString().equals(null)) {
+                    String address = (String) place.getAddress();
+                    text.setText(address.replace(", ", ",\n"));
+                }
+                text = (TextView) findViewById(R.id.number);
+                if (!place.getPhoneNumber().toString().equals(null)) {
+                    String number = (String)place.getPhoneNumber();
+                    text.setText(number.replace(" ", ""));
+                }
+                text = (TextView) findViewById(R.id.webAddress);
+                if (place.getWebsiteUri() == null) {
+                    TextView textView = (TextView) findViewById(R.id.webAddress);
+                    textView.setText("");
+                }
+                else
+                    text.setText(place.getWebsiteUri().toString());
                 places = true;
                 GridLayoutManager layout = (GridLayoutManager) recList.getLayoutManager();
                 layout.removeAllViews();
@@ -324,7 +397,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 textView.setVisibility(View.VISIBLE);
                 textView.setText("Loading...");
                 refresh();
+                Button butt = (Button) findViewById(R.id.placesButton);
+                butt.setText("Get Current Location");
             }
         }
+    }
+
+    public void onClickNumber(View view) {
+        TextView textView = (TextView)findViewById(R.id.number);
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + textView.getText()));
+        startActivity(intent);
+    }
+
+    public void onClickWeb(View view) {
+        TextView textView = (TextView)findViewById(R.id.webAddress);
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse((String)textView.getText()));
+        startActivity(i);
     }
 }

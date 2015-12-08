@@ -61,8 +61,8 @@ public class FetchImages extends AsyncTask<String, Integer, Void> {
 
             Uri builtUri = Uri.parse(Flickr_BASE_URL).buildUpon()
                     .appendQueryParameter(API_PARAM, "5e4604aaf0ff1d97a4a621f9b0d06e17")
-                    .appendQueryParameter(SORT_PARAM, "interestingness-desc")
-                    .appendQueryParameter(LAT_PARAM, Parameters[0])
+                    .appendQueryParameter(SORT_PARAM, MainActivity.sharedpreferences.getString("searchType", "relevance"))
+                            .appendQueryParameter(LAT_PARAM, Parameters[0])
                     .appendQueryParameter(LON_PARAM, Parameters[1])
                     .appendQueryParameter(FORMAT_PARAM, "json")
                     .build();

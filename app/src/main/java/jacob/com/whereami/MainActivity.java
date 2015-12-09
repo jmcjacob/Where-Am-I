@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         sharedpreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         database = openOrCreateDatabase("Image_Database", MODE_PRIVATE, null);
+        database.execSQL("CREATE TABLE IF NOT EXISTS IMAGES(TITLE VARCHAR,ID VARCHAR, THUMBNAIL VARCHAR, SOURCE VARCHAR);");
 
         TextView textView = (TextView) findViewById(R.id.locationName);
         lat = Double.longBitsToDouble(sharedpreferences.getLong("latestLat", Double.doubleToLongBits(0.0)));
@@ -215,7 +216,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 if (isLocationEnabled(this))
                     guessCurrentPlace();
             setFact();
-            database.execSQL("CREATE TABLE IF NOT EXISTS IMAGES(TITLE VARCHAR,ID VARCHAR, THUMBNAIL VARCHAR, SOURCE VARCHAR);");
             database.execSQL("DELETE FROM IMAGES;");
             FetchImages task = new FetchImages();
             task.images = sharedpreferences.getInt("loadImage",50);

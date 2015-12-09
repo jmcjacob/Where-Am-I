@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jacob.whereiam.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.concurrent.TimeUnit;
 
@@ -53,10 +54,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                 title = c.getString(c.getColumnIndex("TITLE"));
             }
             c.close();
-            FetchBitmap task = new FetchBitmap();
-            task.execute(src);
-            Bitmap image = task.get(1000, TimeUnit.MILLISECONDS);
-            imageViewHolder.vImage.setImageBitmap(image);
+            Picasso.with(MainActivity.context).load(src).into(imageViewHolder.vImage);
             imageViewHolder.vTitle.setText(title);
         }
         catch (Exception e) {

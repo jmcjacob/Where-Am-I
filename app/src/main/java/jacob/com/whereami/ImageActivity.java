@@ -104,7 +104,7 @@ public class ImageActivity extends AppCompatActivity {
         }
         try {
             FileOutputStream fos = new FileOutputStream(pictureFile);
-            image.compress(Bitmap.CompressFormat.PNG, 90, fos);
+            image.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.close();
         } catch (FileNotFoundException e) {
             Log.d(LOG_TAG, "File not found: " + e.getMessage());
@@ -120,9 +120,8 @@ public class ImageActivity extends AppCompatActivity {
                 return null;
             }
         }
-        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
         File mediaFile;
-        String mImageName="MI_"+ timeStamp +".jpg";
+        String mImageName=getTitle() + ".jpg";
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
         return mediaFile;
     }

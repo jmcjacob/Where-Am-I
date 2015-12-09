@@ -70,7 +70,7 @@ public class SettingsActivity extends AppCompatActivity {
         MainActivity.sharedpreferences.edit().clear().commit();
         option1.setText("50");
         option2.setText("25");
-        option3.setText("interestingness-desc");
+        option3.setText("relevance");
         edited=true;
         Toast toast = Toast.makeText(getApplicationContext(), "Reset Preferences", Toast.LENGTH_SHORT);
         toast.show();

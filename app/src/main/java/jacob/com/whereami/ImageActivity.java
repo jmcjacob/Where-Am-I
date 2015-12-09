@@ -14,6 +14,8 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
 import com.jacob.whereiam.R;
+import com.squareup.picasso.Picasso;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -48,20 +50,9 @@ public class ImageActivity extends AppCompatActivity {
             src = c.getString(c.getColumnIndex("SOURCE"));
             title = c.getString(c.getColumnIndex("TITLE"));
         }
-
-        FetchBitmap task = new FetchBitmap();
-        task.execute(src);
-
         setTitle(title);
         ImageView imageView = (ImageView)findViewById(R.id.sourceImage);
-        try {
-            image = task.get(1000, TimeUnit.MILLISECONDS);
-            imageView.setImageBitmap(image);
-            }
-        catch (Exception e) {
-            Log.e(LOG_TAG, "FectchBitmap in ImageActivity: " + e);
-
-        }
+        Picasso.with(this).load(src).into(imageView);
     }
 
     @Override

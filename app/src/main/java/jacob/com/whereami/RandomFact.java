@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+// This class pulls a random fact from the numbers API in a new thread
+// Hu, D. and Duan, M.(2015) Numbers API. [online] Available from http://numbersapi.com/#42 [Accessed on 3 December 2015].
 public class RandomFact extends AsyncTask<Void, Void, String> {
 
     private final String LOG_TAG = CatFact.class.getSimpleName();

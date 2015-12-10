@@ -1,42 +1,40 @@
 package jacob.com.whereami;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
 import com.jacob.whereiam.R;
 import com.squareup.picasso.Picasso;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.Key;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
+// Class for the Image Activity that is loaded on click of an item from the MainActivity and features code from
+// Square (2015) Picasso. [software] version 2.5.2. Available from http://square.github.io/picasso/ [Accessed 8 December 2015].
+// Google (2015) Sending Simple Data to Other Apps. [online] California, USA: Google. Available from http://developer.android.com/training/sharing/send.html [Accessed on 3 December 2015].
+// GoCrazy (2013) How to save a bitmap on internal storage. [Online] Stackoverflow. Available from http://stackoverflow.com/questions/15662258/how-to-save-a-bitmap-on-internal-storage [Accessed on 3 December 2015].
 public class ImageActivity extends AppCompatActivity {
 
     private final String LOG_TAG = ImageActivity.class.getSimpleName();
     public String title;
     public String src;
-    public Bitmap image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
@@ -74,12 +72,21 @@ public class ImageActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_save) {
-            Toast toast = Toast.makeText(getApplicationContext(), "Saving "+title + ".jpg", Toast.LENGTH_SHORT);
-            toast.show();
-            storeImage(image);
-            toast = Toast.makeText(getApplicationContext(), "Saved " + title + ".jpg", Toast.LENGTH_SHORT);
-            toast.show();
-            return true;
+            ImageView image = (ImageView)findViewById(R.id.sourceImage);
+            Bitmap bitmap = ((BitmapDrawable)image.getDrawable()).getBitmap();
+            if (!bitmap.equals(null)) {
+                Toast toast = Toast.makeText(getApplicationContext(), "Saving " + title + ".jpg", Toast.LENGTH_SHORT);
+                toast.show();
+                storeImage(bitmap);
+                toast = Toast.makeText(getApplicationContext(), "Saved " + title + ".jpg", Toast.LENGTH_SHORT);
+                toast.show();
+                return true;
+            }
+            else {
+                Toast toast = Toast.makeText(getApplicationContext(), "Could not save image", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+            return false;
         }
         if (id == 16908332) {
             super.onBackPressed();
@@ -95,7 +102,7 @@ public class ImageActivity extends AppCompatActivity {
         }
         try {
             FileOutputStream fos = new FileOutputStream(pictureFile);
-            image.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            image.compress(Bitmap.CompressFormat.PNG, 90, fos);
             fos.close();
         } catch (FileNotFoundException e) {
             Log.d(LOG_TAG, "File not found: " + e.getMessage());
@@ -112,7 +119,7 @@ public class ImageActivity extends AppCompatActivity {
             }
         }
         File mediaFile;
-        String mImageName=getTitle() + ".jpg";
+        String mImageName = getTitle() + ".jpg";
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
         return mediaFile;
     }

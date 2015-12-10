@@ -1,6 +1,5 @@
 package jacob.com.whereami;
 
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -12,8 +11,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
 
+// Class for getting and inserting an returned IDs and Titles to an SQL database in a new thread and features code from
+// Tamada, R. (2013) Android JSON Parsing Tutorial. [online] Available from: http://www.androidhive.info/2012/01/android-json-parsing-tutorial/ [Accessed on 7 November 2015].
 public class FetchImages extends AsyncTask<String, Integer, Void> {
     private final String LOG_TAG = FetchImages.class.getSimpleName();
     public boolean finished = false;

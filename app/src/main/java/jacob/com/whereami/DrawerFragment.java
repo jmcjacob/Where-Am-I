@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.support.v7.widget.Toolbar;
 import com.jacob.whereiam.R;
 
+// Class for the Drawer Fragment to be called on the mainActivity featuring code from
+// SlideNerd (2015) MaterialTest. [online] Available from https://github.com/slidenerd/materialtest [Accessed on 6 November 2015].
 public class DrawerFragment extends Fragment{
     public static final String PREF_FILE_NAME="testpref";
     public static final String KEY_USER_LEARNED_DRAWER="user_learned_drawer";
@@ -27,7 +29,6 @@ public class DrawerFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_drawer, container, false);
     }
-
 
     public void setup(int fragmentID, DrawerLayout drawerLayout, final Toolbar toolbar) {
         View container = getActivity().findViewById(fragmentID);

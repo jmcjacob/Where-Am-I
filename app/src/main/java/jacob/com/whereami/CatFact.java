@@ -11,12 +11,15 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+// Class for retrieving a cat fact from the catfact API in a new thread.
+// Manelik (2013) Cat Facts API. [online] Available from: http://catfacts-api.appspot.com/ [Accessed on 3 December 2015].
+// Tamada, R. (2013) Android JSON Parsing Tutorial. [online] Available from: http://www.androidhive.info/2012/01/android-json-parsing-tutorial/ [Accessed on 7 November 2015].
 public class CatFact extends AsyncTask<Void, Void, String> {
 
     private final String LOG_TAG = CatFact.class.getSimpleName();
 
+    // Method for extracting fact data from the returned JSON string.
     private String getImageDataFromJson(String JsonStr) throws Exception {
-
         JSONObject topobj = new JSONObject(JsonStr);
         JSONArray factArray = topobj.getJSONArray("facts");
         return factArray.getString(0);

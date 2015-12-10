@@ -38,6 +38,11 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.jacob.whereiam.R;
 import java.util.concurrent.TimeUnit;
 
+// The main Activity is where the application opens up to. In the create all the values used across multiple classes are created. This class features code found in
+// Foster, D (2015) Mobile Computing. [lecture] Lincoln: University of Lincoln.
+// Google (2015) Google Places APIs for Android. [software] California, USA: Google. Available from https://developers.google.com/places/android-api/ [Accessed 8 December 2015].
+// Jasmin, A. (2010) Detect whether there is an Internet connection available on Android. [online] Stackoverflow. Available from http://stackoverflow.com/questions/4238921/detect-whether-there-is-an-internet-connection-available-on-android [Accessed on 1 December 2015].
+// Prock, A. and Shankar, A. (2015) How to check if Location Services are enabled? [online] Stackoverflow. Available from http://stackoverflow.com/questions/10311834/how-to-check-if-location-services-are-enabled [Accessed on 1 December 2015].
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -120,17 +125,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         refresh();
     }
 
-    public void onConnectionSuspended(int i) {
+    public void onConnectionSuspended(int i) {}
 
-    }
+    public void onConnected(Bundle b) {}
 
-    public void onConnected(Bundle b) {
-
-    }
-
-    public void onConnectionFailed(ConnectionResult result) {
-
-    }
+    public void onConnectionFailed(ConnectionResult result) {}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

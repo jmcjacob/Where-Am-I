@@ -17,6 +17,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+// Class for executing a JSON request to set a large SRC and small SRC to the database for each row with an ID and features code from
+// Tamada, R. (2013) Android JSON Parsing Tutorial. [online] Available from: http://www.androidhive.info/2012/01/android-json-parsing-tutorial/ [Accessed on 7 November 2015].
 public class FetchImage extends AsyncTask<Void, Void, Boolean> {
 
     private final String LOG_TAG = FetchImage.class.getSimpleName();

@@ -1,17 +1,13 @@
 package jacob.com.whereami;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.jacob.whereiam.R;
-
 import java.util.concurrent.TimeUnit;
 
+// Class for the About Activity within the application accessed from the menu.
 public class AboutActivity extends AppCompatActivity {
 
     @Override
@@ -21,7 +17,6 @@ public class AboutActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         try {
             if (MainActivity.isNetworkAvailable()) {
-
                 CatFact task = new CatFact();
                 task.execute();
                 TextView text = (TextView) findViewById(R.id.plea);
@@ -29,9 +24,7 @@ public class AboutActivity extends AppCompatActivity {
                 text.setText(plea);
             }
         }
-        catch (Exception e) {
-
-        }
+        catch (Exception e) {}
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -1,18 +1,13 @@
 package jacob.com.whereami;
 
-import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +16,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.concurrent.TimeUnit;
 
+// This class adapts a src and a title to a card layout and then adds it to the RecyclerView. It features code from
+// Square (2015) Picasso. [software] version 2.5.2. Available from http://square.github.io/picasso/ [Accessed 8 December 2015].
+// Azzola, F. (2014) A Guide to Android RecyclerView and CardView. [online] Binpress. Available from https://www.binpress.com/tutorial/android-l-recyclerview-and-cardview-tutorial/156 [Accessed on 14 November 2015].
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
     private final String LOG_TAG = ImageAdapter.class.getSimpleName();
 
@@ -45,6 +43,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         TextView text = (TextView)MainActivity.context.findViewById(R.id.fact);
         text.setVisibility(View.INVISIBLE);
         try {
+            //
             Cursor c = MainActivity.database.rawQuery("SELECT * FROM IMAGES", null);
             if (c.moveToFirst()) {
                 for (int j = 0; j < i; j++) {

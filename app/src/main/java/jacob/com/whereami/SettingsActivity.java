@@ -1,7 +1,6 @@
 package jacob.com.whereami;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,15 +11,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.jacob.whereiam.R;
 
-import org.w3c.dom.Text;
-
-import java.util.concurrent.TimeUnit;
-
+// This class is for the Settings activity accessed from the menu in the MainActivity. It is where shared preferences are written and used code featured in
+// Google (2015) Saving Key-Value Sets. [online] California, USA: Google. Available from http://developer.android.com/reference/android/content/SharedPreferences.html [Accessed on 3 December 2015].
+// Zabri (2013) Android: create a popup that has multiple selection options. [online] Stackoverflow. Available from http://stackoverflow.com/questions/16389581/android-create-a-popup-that-has-multiple-selection-options [Accessed on 8 December 2015].
 public class SettingsActivity extends AppCompatActivity {
-    private final String LOG_TAG = SettingsActivity.class.getSimpleName();
     EditText option1;
     EditText option2;
     TextView option3;
